@@ -1,0 +1,101 @@
+# -*- coding: utf-8 -*-
+
+import os
+import json
+import traceback
+import requests
+
+from . import setting
+from . import log
+
+
+class OpenApi():
+
+    _log = log.getLogger()
+
+    def __init__(self):
+        sdk_json = self.get_sdk_json()
+
+        self.gateway = sdk_json.get("gateway", None)
+        self.header_auth = {
+            setting.AUTH_HEADER_DEVOPS_BUILD_TYPE: sdk_json.get("buildType", None),
+            setting.AUTH_HEADER_DEVOPS_PROJECT_ID: sdk_json.get("projectId", None),
+            setting.AUTH_HEADER_DEVOPS_AGENT_ID: sdk_json.get("agentId", None),
+            setting.AUTH_HEADER_DEVOPS_AGENT_SECRET_KEY: sdk_json.get("secretKey", None),
+            setting.AUTH_HEADER_DEVOPS_BUILD_ID: sdk_json.get("buildId", None),
+            setting.AUTH_HEADER_DEVOPS_VM_SEQ_ID: sdk_json.get("vmSeqId", None)
+        }
+
+        # 保存session增加3次重试
+        self.session = requests.Session()
+        self.session.trust_env = False
+        adapter = requests.adapters.HTTPAdapter(max_retries=3)
+        self.session.mount('http://', adapter)
+
+    def get_sdk_json(self):
+        """
+        @Summary：获取sdk配置
+        """
+        if not os.path.exists(setting.BK_SDK_JSON):
+            self._log.error("[openapi]init error: sdk json do not exist")
+            exit(-1)
+
+        with open(setting.BK_SDK_JSON, 'r') as f:
+            content = f.read()
+        if not content:
+            self._log.error("[openapi]init error: sdk json is null")
+            exit(-1)
+
+        try:
+            sdk_json = json.loads(content)
+
+            check_result, field = self.check_sdk_json(sdk_json)
+            if not check_result:
+                self._log.error("[openapi]check sdk json field error: {}".format(field))
+                exit(-1)
+
+            return sdk_json
+        except:
+            traceback.print_exc()
+            self._log.error("[openapi]parse sdk json error")
+            exit(-1)
+
+    def check_sdk_json(self, src_json):
+        """
+        @Summary：检查sdk配置
+        """
+        for field in setting.BK_SDK_JSON_FIELDS:
+            if not src_json.get(field, None):
+                return False, field
+
+        return True, ""
+
+    def generate_url(self, path):
+        """
+        @Summary：组装访问openapi的url
+        """
+        return "http://{}{}".format(self.gateway, path.lstrip("/"))
+
+    def get_artifacts_url(self, file_src, file_path, project_code, pipeline_id, build_id):
+        """
+        @Summary: 获取已归档构件的下载链接
+        @Param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
+        @Param file_path: 构件的相对路径
+        """
+        path = "/artifactory/api/build/artifactories/project/{}/pipeline/{}/buildId/{}/getFileDownloadUrl? \
+                artifactoryType={}&path={}".format(project_code, pipeline_id, build_id, file_src, file_path)
+        url = self.generate_url(path)
+        r = self.session.get(url, headers=self.header_auth)
+
+        if r.status_code == 200:
+            try:
+                ret = json.loads(r.text)
+                if not ret.status:
+                    return False, "[openapi]get_artifacts_url error, status: {}, msg: {}".format(
+                        ret.status, ret.message)
+                return True, ret.data
+            except:
+                self._log.error(r.text)
+                return False, "[openapi]get_artifacts_url error, invalid response: {}".format(r.text)
+        else:
+            return False, "[openapi]get_artifacts_url error, response status code is {}".format(r.status_code)
