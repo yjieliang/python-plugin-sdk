@@ -82,20 +82,25 @@ class OpenApi():
         @Param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
         @Param file_path: 构件的相对路径
         """
-        path = "/artifactory/api/build/artifactories/project/{}/pipeline/{}/buildId/{}/getFileDownloadUrl? \
-                artifactoryType={}&path={}".format(project_code, pipeline_id, build_id, file_src, file_path)
+        path = "/artifactory/api/build/artifactories/project/{}/pipeline/{}/buildId/{}/getFileDownloadUrl".format(
+            project_code, pipeline_id, build_id)
+        params = {
+            "artifactoryType": file_src,
+            "path": file_path
+        }
         url = self.generate_url(path)
-        r = self.session.get(url, headers=self.header_auth)
+        r = self.session.get(url, headers=self.header_auth, params=params)
+        # self._log.debug(r.url)
 
         if r.status_code == 200:
             try:
-                ret = json.loads(r.text)
-                if not ret.status:
+                ret = r.json()
+                if ret["status"] != 0:
                     return False, "[openapi]get_artifacts_url error, status: {}, msg: {}".format(
-                        ret.status, ret.message)
-                return True, ret.data
+                        ret["status"], ret["message"])
+                return True, ret["data"]
             except:
                 self._log.error(r.text)
                 return False, "[openapi]get_artifacts_url error, invalid response: {}".format(r.text)
         else:
-            return False, "[openapi]get_artifacts_url error, response status code is {}".format(r.status_code)
+            return False, "[openapi]get_artifacts_url error, code: {}, response: {}".format(r.status_code, r.text)
