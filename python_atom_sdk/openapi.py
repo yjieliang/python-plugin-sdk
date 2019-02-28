@@ -74,7 +74,7 @@ class OpenApi():
         """
         @Summary：组装访问openapi的url
         """
-        return "http://{}{}".format(self.gateway, path.lstrip("/"))
+        return "http://{}/{}".format(self.gateway, path.lstrip("/"))
 
     def get_artifacts_url(self, file_src, file_path, project_code, pipeline_id, build_id):
         """
