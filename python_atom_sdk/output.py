@@ -16,7 +16,7 @@ class SetOutput():
 
     def __init__(self):
         self.data_path = os.getenv(setting.BK_DATA_DIR, '.')
-        self.output_file_name = os.getenv(setting.BK_DATA_INPUT, 'output.json')
+        self.output_file_name = os.getenv(setting.BK_DATA_OUTPUT, 'output.json')
 
     def check_output(self, output):
         """
@@ -56,7 +56,6 @@ class SetOutput():
         @summary: 设置原子执行结果、输出参数
         @param output: 输出参数和执行结果dict
         """
-
         self.check_output(output)
 
         output_file_path = os.path.join(self.data_path, self.output_file_name)
@@ -64,6 +63,7 @@ class SetOutput():
             try:
                 os.mkdir(self.data_path)
             except FileExistsError:
+                self._log.debug("mkdir data_path error")
                 pass
 
         with open(output_file_path, 'w') as f:

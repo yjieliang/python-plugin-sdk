@@ -8,30 +8,24 @@ from . import setting
 from .log import getLogger
 from .input import ParseParams
 from .output import SetOutput
-from .openapi import OpenApi
 
 log = getLogger()
 parseParamsObj = ParseParams()
 params = parseParamsObj.get_input()
 
 # 执行结果
-status = {
-    "success": setting.BK_ATOM_STATUS.get("SUCCESS", ""),
-    "failure": setting.BK_ATOM_STATUS.get("FAILURE", ""),
-    "error": setting.BK_ATOM_STATUS.get("ERROR", "")
-}
+def get_status(status):
+    return setting.BK_ATOM_STATUS.get(status.upper(), None)
+
 
 # 输出模版类型
-output_template_type = {
-    "default": setting.BK_OUTPUT_TEMPLATE_TYPE.get("DEFAULT", "")
-}
+def get_output_template_type(type):
+    return setting.BK_OUTPUT_TEMPLATE_TYPE.get(type.upper(), None)
+
 
 # 输出字段类型
-output_field_type = {
-    "string": setting.BK_OUTPUT_FIELD_TYPE.get("STRING", ""),
-    "artifact": setting.BK_OUTPUT_FIELD_TYPE.get("ARTIFACT", ""),
-    "report": setting.BK_OUTPUT_FIELD_TYPE.get("REPORT", "")
-}
+def get_output_field_type(type):
+    return setting.BK_OUTPUT_FIELD_TYPE.get(type.upper(), None)
 
 
 def get_input():
@@ -87,6 +81,7 @@ def get_pipeline_version():
 
 
 def get_artifact_urls(file_src, file_path, project_code, pipeline_id, build_id):
+    from .openapi import OpenApi
     client = OpenApi()
     return client.get_artifacts_url(file_src, file_path, project_code, pipeline_id, build_id)
 
