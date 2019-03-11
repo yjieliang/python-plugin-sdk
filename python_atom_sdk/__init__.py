@@ -4,28 +4,17 @@ import os
 import sys
 import json
 
-from . import setting
 from .log import getLogger
 from .input import ParseParams
 from .output import SetOutput
+from .const import Status, OutputTemplateType, OutputFieldType
 
 log = getLogger()
 parseParamsObj = ParseParams()
 params = parseParamsObj.get_input()
-
-# 执行结果
-def get_status(status):
-    return setting.BK_ATOM_STATUS.get(status.upper(), None)
-
-
-# 输出模版类型
-def get_output_template_type(type):
-    return setting.BK_OUTPUT_TEMPLATE_TYPE.get(type.upper(), None)
-
-
-# 输出字段类型
-def get_output_field_type(type):
-    return setting.BK_OUTPUT_FIELD_TYPE.get(type.upper(), None)
+status = Status()
+output_template_type = OutputTemplateType()
+output_field_type = OutputFieldType()
 
 
 def get_input():
