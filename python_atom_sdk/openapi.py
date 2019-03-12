@@ -135,7 +135,7 @@ class OpenApi():
 
         result, filepath = self._download_file(download_url)
         if not result:
-            return result, filepath
+            return result
 
         fields = {
             file_field: (filepath, open(filepath, "rb").read())

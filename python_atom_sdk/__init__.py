@@ -95,7 +95,7 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}):
 
     result, download_url_list = get_artifact_urls(file_src, file_path)
     if not result:
-        return result, download_url_list
+        return result
 
     return client._upload_file(download_url_list[0], upload_url, params=params, headers=headers)
 
