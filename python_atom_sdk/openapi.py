@@ -4,14 +4,15 @@ import os
 import json
 import traceback
 import requests
+import requests_toolbelt as rt
 
 from . import setting
-from . import log
+from .bklog import getLogger
 
 
 class OpenApi():
 
-    _log = log.getLogger()
+    _log = getLogger()
 
     def __init__(self):
         sdk_json = self.get_sdk_json()
@@ -34,7 +35,7 @@ class OpenApi():
 
     def get_sdk_json(self):
         """
-        @Summary：获取sdk配置
+        @summary：获取sdk配置
         """
         if not os.path.exists(setting.BK_SDK_JSON):
             self._log.error("[openapi]init error: sdk json do not exist")
@@ -62,7 +63,7 @@ class OpenApi():
 
     def check_sdk_json(self, src_json):
         """
-        @Summary：检查sdk配置
+        @summary：检查sdk配置
         """
         for field in setting.BK_SDK_JSON_FIELDS:
             if not src_json.get(field, None):
@@ -72,15 +73,15 @@ class OpenApi():
 
     def generate_url(self, path):
         """
-        @Summary：组装访问openapi的url
+        @summary：组装访问openapi的url
         """
         return "http://{}/{}".format(self.gateway, path.lstrip("/"))
 
     def get_artifacts_url(self, file_src, file_path, project_code, pipeline_id, build_id):
         """
-        @Summary: 获取已归档构件的下载链接
-        @Param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
-        @Param file_path: 构件的相对路径
+        @summary: 获取已归档构件的下载链接
+        @param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
+        @param file_path: 构件的相对路径
         """
         path = "/artifactory/api/build/artifactories/project/{}/pipeline/{}/buildId/{}/getFileDownloadUrl".format(
             project_code, pipeline_id, build_id)
@@ -104,3 +105,49 @@ class OpenApi():
                 return False, "[openapi]get_artifacts_url error, invalid response: {}".format(r.text)
         else:
             return False, "[openapi]get_artifacts_url error, code: {}, response: {}".format(r.status_code, r.text)
+
+    def _download_file(self, file_url):
+        """
+        @summary: 下载文件到本地
+        @param file_url: 下载链接
+        @ret file_path_local: 下载后存储的本地路径
+        """
+        r = self.session.get(file_url, headers=self.header_auth)
+
+        if r.status_code != 200:
+            self._log.error("download file failed, status_code is {}".format(r.status_code))
+            return False, r.status_code
+
+        file_name = os.path.basename(file_url)
+
+        file_path_local = os.path.join(os.getenv(setting.BK_DATA_DIR, '.'), file_name)
+        with open(file_path_local, 'wb') as f:
+            for chunk in r.iter_content(chunk_size=512):
+                if chunk:
+                    f.write(chunk)
+
+        return True, file_path_local
+
+    def _upload_file(self, download_url, upload_url, params={}, headers={}, file_field="file"):
+        """
+        @summary: 从仓库获取构件，并推送到第三方系统
+        """
+
+        result, filepath = self._download_file(download_url)
+        if not result:
+            return result, filepath
+
+        fields = {
+            file_field: (filepath, open(filepath, "rb").read())
+        }
+        fields.update(params)
+        m = rt.MultipartEncoder(fields=fields)
+
+        _headers = {
+            "Content-Type": m.content_type,
+            "accept": "application/json"
+        }
+        _headers.update(headers)
+
+        response = requests.post(upload_url, data=m, headers=_headers)
+        return response.json()

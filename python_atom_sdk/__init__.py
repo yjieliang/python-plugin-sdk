@@ -4,7 +4,7 @@ import os
 import sys
 import json
 
-from .log import getLogger
+from .bklog import getLogger
 from .input import ParseParams
 from .output import SetOutput
 from .const import Status, OutputTemplateType, OutputFieldType
@@ -69,9 +69,12 @@ def get_pipeline_version():
     return params.get("pipeline.version", None)
 
 
-def get_artifact_urls(file_src, file_path, project_code, pipeline_id, build_id):
+def get_artifact_urls(file_src, file_path):
     from .openapi import OpenApi
     client = OpenApi()
+    project_code = get_project_name()
+    pipeline_id = get_pipeline_id()
+    build_id = get_pipeline_build_id()
     return client.get_artifacts_url(file_src, file_path, project_code, pipeline_id, build_id)
 
 
@@ -81,6 +84,20 @@ def set_output(output):
     """
     setOutput = SetOutput()
     setOutput.set_output(output)
+
+
+def upload_file(file_src, file_path, upload_url, params={}, headers={}):
+    """
+    @summary: 上传构件到第三方平台
+    """
+    from .openapi import OpenApi
+    client = OpenApi()
+
+    result, download_url_list = get_artifact_urls(file_src, file_path)
+    if not result:
+        return result, download_url_list
+
+    return client._upload_file(download_url_list[0], upload_url, params=params, headers=headers)
 
 
 if __name__ == "__main__":

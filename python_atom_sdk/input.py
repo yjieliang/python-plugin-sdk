@@ -4,7 +4,7 @@ import os
 import json
 
 from . import setting
-from . import log
+from .bklog import getLogger
 
 
 class ParseParams():
@@ -12,7 +12,7 @@ class ParseParams():
     @summary: 获取原子入参
     """
 
-    _log = log.getLogger()
+    _log = getLogger()
 
     def __init__(self):
         self.data_path = os.getenv(setting.BK_DATA_DIR, '.')
