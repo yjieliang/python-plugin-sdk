@@ -86,7 +86,7 @@ def set_output(output):
     setOutput.set_output(output)
 
 
-def upload_file(file_src, file_path, upload_url, params={}, headers={}):
+def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_field="file"):
     """
     @summary: 上传构件到第三方平台
     """
@@ -97,7 +97,7 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}):
     if not result:
         return result
 
-    return client._upload_file(download_url_list[0], upload_url, params=params, headers=headers)
+    return client._upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field)
 
 
 if __name__ == "__main__":
