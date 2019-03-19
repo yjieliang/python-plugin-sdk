@@ -97,7 +97,21 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_fie
     if not result:
         return result
 
-    return client._upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field)
+    return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field)
+
+
+def download_file(file_src, file_path, file_name=None):
+    """
+    @summary: 从仓库下载构件到本地
+    """
+    from .openapi import OpenApi
+    client = OpenApi()
+
+    result, download_url_list = get_artifact_urls(file_src, file_path)
+    if not result:
+        return result
+
+    return client.download_file(download_url_list[0], file_name)
 
 
 if __name__ == "__main__":

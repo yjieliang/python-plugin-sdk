@@ -83,11 +83,11 @@ class OpenApi():
         @param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
         @param file_path: 构件的相对路径
         """
-        path = "/artifactory/api/build/artifactories/project/{}/pipeline/{}/buildId/{}/getFileDownloadUrl".format(
-            project_code, pipeline_id, build_id)
+        path = "/artifactory/api/build/artifactories/thirdPartyDownloadUrl"
         params = {
             "artifactoryType": file_src,
-            "path": file_path
+            "path": file_path,
+            "ttl": 3600
         }
         url = self.generate_url(path)
         r = self.session.get(url, headers=self.header_auth, params=params)
@@ -106,10 +106,11 @@ class OpenApi():
         else:
             return False, "[openapi]get_artifacts_url error, code: {}, response: {}".format(r.status_code, r.text)
 
-    def _download_file(self, file_url):
+    def download_file(self, file_url, file_name=None):
         """
         @summary: 下载文件到本地
         @param file_url: 下载链接
+        @param file_name: 本地储存的文件名，选填
         @ret file_path_local: 下载后存储的本地路径
         """
         r = self.session.get(file_url, headers=self.header_auth)
@@ -118,9 +119,15 @@ class OpenApi():
             self._log.error("download file failed, status_code is {}".format(r.status_code))
             return False, r.status_code
 
-        file_name = os.path.basename(file_url)
+        if not file_name:
+            file_url_list = file_url.split("?", 1)
+            file_name = os.path.basename(file_url_list[0])
 
         file_path_local = os.path.join(os.getenv(setting.BK_DATA_DIR, '.'), file_name)
+        file_path_dir = os.path.dirname(file_path_local)
+        if not os.path.exists(file_path_dir):
+            os.makedirs(file_path_dir)
+
         with open(file_path_local, 'wb') as f:
             for chunk in r.iter_content(chunk_size=512):
                 if chunk:
@@ -128,12 +135,12 @@ class OpenApi():
 
         return True, file_path_local
 
-    def _upload_file(self, download_url, upload_url, params={}, headers={}, file_field="file"):
+    def upload_file(self, download_url, upload_url, params={}, headers={}, file_field="file"):
         """
         @summary: 从仓库获取构件，并推送到第三方系统
         """
 
-        result, filepath = self._download_file(download_url)
+        result, filepath = self.download_file(download_url)
         if not result:
             return result
 
