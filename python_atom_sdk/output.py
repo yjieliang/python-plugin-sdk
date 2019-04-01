@@ -39,11 +39,14 @@ class SetOutput():
                 pass
             elif field_type == setting.BK_OUTPUT_FIELD_TYPE.get("ARTIFACT", ""):
                 field_value = v.get("value", [])
+                if not isinstance(field_type, list):
+                    self._log.error("[check output error]invalid field[{}], should be list".format(k))
+                    exit(-1)
                 for file_path in field_value:
                     if not os.path.exists(file_path):
                         self._log.error("[check output error]invalid field[{}], not exists[{}]".format(k, file_path))
                         exit(-1)
-            elif field_type == setting.BK_OUTPUT_FIELD_TYPE.get("report", ""):
+            elif field_type == setting.BK_OUTPUT_FIELD_TYPE.get("REPORT", ""):
                 pass
             else:
                 self._log.error("[check output error]invalid field type: {}".format(field_type))
