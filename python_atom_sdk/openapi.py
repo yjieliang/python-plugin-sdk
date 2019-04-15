@@ -87,7 +87,7 @@ class OpenApi():
         params = {
             "artifactoryType": file_src,
             "path": file_path,
-            "ttl": 3600
+            "ttl": 3600*24
         }
         url = self.generate_url(path)
         r = self.session.get(url, headers=self.header_auth, params=params)
