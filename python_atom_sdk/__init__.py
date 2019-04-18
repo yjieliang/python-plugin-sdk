@@ -69,13 +69,20 @@ def get_pipeline_version():
     return params.get("pipeline.version", None)
 
 
+def get_workspace():
+    return params.get("bkWorkspace", None)
+
+
 def get_artifact_urls(file_src, file_path):
     from .openapi import OpenApi
     client = OpenApi()
-    project_code = get_project_name()
-    pipeline_id = get_pipeline_id()
-    build_id = get_pipeline_build_id()
-    return client.get_artifacts_url(file_src, file_path, project_code, pipeline_id, build_id)
+    return client.get_artifacts_url(file_src, file_path)
+
+
+def get_artifacts_properties(file_src, file_path):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_artifacts_properties(file_src, file_path)
 
 
 def set_output(output):
@@ -95,7 +102,11 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_fie
 
     result, download_url_list = get_artifact_urls(file_src, file_path)
     if not result:
-        return result
+        return False
+
+    if len(download_url_list) > 1:
+        log.error("found multiple files, confused")
+        return False
 
     return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field)
 
@@ -109,7 +120,11 @@ def download_file(file_src, file_path, file_name=None):
 
     result, download_url_list = get_artifact_urls(file_src, file_path)
     if not result:
-        return result
+        return False
+
+    if len(download_url_list) > 1:
+        log.error("found multiple files, confused")
+        return False
 
     return client.download_file(download_url_list[0], file_name)
 
