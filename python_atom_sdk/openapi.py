@@ -120,7 +120,7 @@ class OpenApi():
         }
         url = self.generate_url(path)
         r = self.session.get(url, headers=self.header_auth, params=params)
-        self._log.debug(r.url)
+        # self._log.debug(r.url)
 
         if r.status_code == 200:
             try:
