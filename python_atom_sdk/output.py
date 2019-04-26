@@ -9,7 +9,7 @@ from .bklog import getLogger
 
 class SetOutput():
     """
-    @summary: 设置原子输出
+    @summary: 设置 插件输出
     """
 
     _log = getLogger()
@@ -20,7 +20,7 @@ class SetOutput():
 
     def check_output(self, output):
         """
-        @summary: 检查原子输出是否合法
+        @summary: 检查 插件输出是否合法
         """
         status = output.get("status", None)
         if not status or status not in setting.BK_ATOM_STATUS.values():
@@ -56,7 +56,7 @@ class SetOutput():
 
     def set_output(self, output):
         """
-        @summary: 设置原子执行结果、输出参数
+        @summary: 设置 插件执行结果、输出参数
         @param output: 输出参数和执行结果dict
         """
         self.check_output(output)

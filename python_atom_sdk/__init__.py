@@ -19,7 +19,7 @@ output_field_type = OutputFieldType()
 
 def get_input():
     """
-    @summary: 获取原子输入参数
+    @summary: 获取 插件输入参数
     @return dict
     """
     return params

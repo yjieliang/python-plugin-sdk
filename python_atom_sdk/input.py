@@ -11,7 +11,7 @@ from .bklog import getLogger
 
 class ParseParams():
     """
-    @summary: 获取原子入参
+    @summary: 获取 插件入参
     """
 
     _log = getLogger()
@@ -22,7 +22,7 @@ class ParseParams():
 
     def get_input(self):
         """
-        @summary: 获取原子输入参数
+        @summary: 获取 插件输入参数
         @return dict
         """
         input_file_path = os.path.join(self.data_path, self.input_file_name)

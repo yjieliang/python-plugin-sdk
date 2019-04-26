@@ -5,7 +5,7 @@ from . import setting
 
 class Status:
     """
-    @summary: 原子执行结果定义
+    @summary:  插件执行结果定义
     """
     ERROR = setting.BK_ATOM_STATUS.get("ERROR", None)
     FAILURE = setting.BK_ATOM_STATUS.get("FAILURE", None)
@@ -14,14 +14,14 @@ class Status:
 
 class OutputTemplateType:
     """
-    @summary: 原子输出模版类型
+    @summary:  插件输出模版类型
     """
     DEFAULT = setting.BK_OUTPUT_TEMPLATE_TYPE.get("DEFAULT", None)
 
 
 class OutputFieldType:
     """
-    @summary: 原子输出字段类型
+    @summary:  插件输出字段类型
     """
     STRING = setting.BK_OUTPUT_FIELD_TYPE.get("STRING", None)
     ARTIFACT = setting.BK_OUTPUT_FIELD_TYPE.get("ARTIFACT", None)
