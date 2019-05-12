@@ -26,7 +26,7 @@ class ParseParams():
         @return dict
         """
         input_file_path = os.path.join(self.data_path, self.input_file_name)
-        self._log.info("input_file_path: {}".format(input_file_path))
+        # self._log.info("input_file_path: {}".format(input_file_path))
         if os.path.exists(input_file_path):
             if sys.version_info.major == 2:
                 with codecs.open(input_file_path, "r", encoding="utf-8") as f:
