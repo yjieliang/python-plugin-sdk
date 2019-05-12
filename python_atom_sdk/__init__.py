@@ -73,6 +73,15 @@ def get_workspace():
     return params.get("bkWorkspace", None)
 
 
+def get_sensitive_conf(key):
+    confJsonStr = params.get("bkSensitiveConfInfo", None)
+    if confJsonStr:
+        confJson = json.loads(confJsonStr)
+        return confJson.get(key, None)
+    else:
+        return None
+
+
 def get_artifact_urls(file_src, file_path):
     from .openapi import OpenApi
     client = OpenApi()
