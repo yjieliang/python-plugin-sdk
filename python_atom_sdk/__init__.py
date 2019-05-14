@@ -74,9 +74,8 @@ def get_workspace():
 
 
 def get_sensitive_conf(key):
-    confJsonStr = params.get("bkSensitiveConfInfo", None)
-    if confJsonStr:
-        confJson = json.loads(confJsonStr)
+    confJson = params.get("bkSensitiveConfInfo", None)
+    if confJson:
         return confJson.get(key, None)
     else:
         return None
