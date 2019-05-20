@@ -25,7 +25,8 @@ BK_ATOM_STATUS = {
 
 #  插件输出模版类型
 BK_OUTPUT_TEMPLATE_TYPE = {
-    "DEFAULT": "default"
+    "DEFAULT": "default",
+    "QUALITY": "quality"
 }
 
 #  插件输出字段类型
@@ -33,4 +34,10 @@ BK_OUTPUT_FIELD_TYPE = {
     "STRING": "string",
     "ARTIFACT": "artifact",
     "REPORT": "report"
+}
+
+# 插件输出为报告时，报告类型
+BK_OUTPUT_REPORT_TYPR = {
+    "INTERNAL": "INTERNAL",
+    "THIRDPARTY": "THIRDPARTY"
 }

@@ -169,6 +169,7 @@ class OpenApi():
         """
         @summary: 从仓库获取构件，并推送到第三方系统
         """
+        self._log.info("upload_url: {}, params: {}, headers={}".format(upload_url, params, headers))
 
         result, filepath = self.download_file(download_url)
         if not result:

@@ -7,7 +7,7 @@ import json
 from .bklog import getLogger
 from .input import ParseParams
 from .output import SetOutput
-from .const import Status, OutputTemplateType, OutputFieldType
+from .const import Status, OutputTemplateType, OutputFieldType, OutputReportType
 
 log = getLogger()
 parseParamsObj = ParseParams()
@@ -15,6 +15,7 @@ params = parseParamsObj.get_input()
 status = Status()
 output_template_type = OutputTemplateType()
 output_field_type = OutputFieldType()
+output_report_type = OutputReportType()
 
 
 def get_input():
@@ -73,6 +74,13 @@ def get_workspace():
     return params.get("bkWorkspace", None)
 
 
+def get_test_version_flag():
+    """
+    @summary: 当前插件是否是测试版本标识
+    """
+    return params.get("testVersionFlag", None)
+
+
 def get_sensitive_conf(key):
     confJson = params.get("bkSensitiveConfInfo", None)
     if confJson:
@@ -114,6 +122,10 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_fie
 
     if len(download_url_list) > 1:
         log.error("found multiple files, confused")
+        return False
+
+    if len(download_url_list) == 0:
+        log.error("can not find file, please check file_src & file_path")
         return False
 
     return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field)

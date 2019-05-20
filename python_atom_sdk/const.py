@@ -17,6 +17,7 @@ class OutputTemplateType:
     @summary:  插件输出模版类型
     """
     DEFAULT = setting.BK_OUTPUT_TEMPLATE_TYPE.get("DEFAULT", None)
+    QUALITY = setting.BK_OUTPUT_TEMPLATE_TYPE.get("QUALITY", None)
 
 
 class OutputFieldType:
@@ -26,3 +27,11 @@ class OutputFieldType:
     STRING = setting.BK_OUTPUT_FIELD_TYPE.get("STRING", None)
     ARTIFACT = setting.BK_OUTPUT_FIELD_TYPE.get("ARTIFACT", None)
     REPORT = setting.BK_OUTPUT_FIELD_TYPE.get("REPORT", None)
+
+
+class OutputReportType:
+    """
+    @summary:  插件输出字段类型为报告时，报告类型
+    """
+    INTERNAL = setting.BK_OUTPUT_REPORT_TYPR.get("INTERNAL", None)
+    THIRDPARTY = setting.BK_OUTPUT_REPORT_TYPR.get("THIRDPARTY", None)
