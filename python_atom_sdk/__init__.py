@@ -149,5 +149,11 @@ def download_file(file_src, file_path, file_name=None):
     return client.download_file(download_url_list[0], file_name)
 
 
+def get_credential(credential_id):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_credential(credential_id)
+
+
 if __name__ == "__main__":
     pass

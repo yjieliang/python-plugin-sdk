@@ -189,3 +189,27 @@ class OpenApi():
 
         response = requests.post(upload_url, data=m, headers=_headers)
         return response.json()
+
+    def get_credential(self, credential_id):
+        """
+        @summary：根据凭据ID，获取凭据内容
+        """
+
+        path = "/ticket/api/build/credentials/{}/detail".format(credential_id)
+        url = self.generate_url(path)
+        r = self.session.get(url, headers=self.header_auth)
+
+        if r.status_code == 200:
+            try:
+                ret = r.json()
+                if ret["status"] != 0:
+                    self._log.error("unexpected status: {}".format(r.text))
+                    return False, {}
+
+                return True, ret["data"]
+            except:
+                self._log.error("abnormal: {}".format(r.text))
+                return False, {}
+        else:
+            self._log.error("unexpected status_code: {}" .format(r.text))
+            return False, {}
