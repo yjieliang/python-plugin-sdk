@@ -155,5 +155,11 @@ def get_credential(credential_id):
     return client.get_credential(credential_id)
 
 
+def get_commits():
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_commits()
+
+
 if __name__ == "__main__":
     pass

@@ -77,6 +77,27 @@ class OpenApi():
         """
         return "http://{}/{}".format(self.gateway, path.lstrip("/"))
 
+    def do_get(self, url, params=None):
+        if params:
+            r = self.session.get(url, headers=self.header_auth, params=params)
+        else:
+            r = self.session.get(url, headers=self.header_auth)
+
+        if r.status_code == 200:
+            try:
+                ret = r.json()
+                if ret["status"] != 0:
+                    self._log.error("unexpected status: {}".format(r.text))
+                    return False, {}
+
+                return True, ret["data"]
+            except:
+                self._log.error("abnormal: {}".format(r.text))
+                return False, {}
+        else:
+            self._log.error("unexpected status_code: {}" .format(r.text))
+            return False, {}
+
     def get_artifacts_url(self, file_src, file_path):
         """
         @summary: 获取已归档构件的下载链接
@@ -90,22 +111,7 @@ class OpenApi():
             "ttl": 3600*24
         }
         url = self.generate_url(path)
-        r = self.session.get(url, headers=self.header_auth, params=params)
-        # self._log.debug(r.url)
-
-        if r.status_code == 200:
-            try:
-                ret = r.json()
-                if ret["status"] != 0:
-                    self._log.error(r.text)
-                    return False, {}
-                return True, ret["data"]
-            except:
-                self._log.error(r.text)
-                return False, {}
-        else:
-            self._log.error(r.text)
-            return False, {}
+        return self.do_get(url, params=params)
 
     def get_artifacts_properties(self, file_src, file_path):
         """
@@ -119,22 +125,7 @@ class OpenApi():
             "path": file_path
         }
         url = self.generate_url(path)
-        r = self.session.get(url, headers=self.header_auth, params=params)
-        # self._log.debug(r.url)
-
-        if r.status_code == 200:
-            try:
-                ret = r.json()
-                if ret["status"] != 0:
-                    self._log.error(r.text)
-                    return False, {}
-                return True, ret["data"]
-            except:
-                self._log.error(r.text)
-                return False, {}
-        else:
-            self._log.error(r.text)
-            return False, {}
+        return self.do_get(url, params=params)
 
     def download_file(self, file_url, file_name=None):
         """
@@ -197,19 +188,13 @@ class OpenApi():
 
         path = "/ticket/api/build/credentials/{}/detail".format(credential_id)
         url = self.generate_url(path)
-        r = self.session.get(url, headers=self.header_auth)
+        return self.do_get(url)
 
-        if r.status_code == 200:
-            try:
-                ret = r.json()
-                if ret["status"] != 0:
-                    self._log.error("unexpected status: {}".format(r.text))
-                    return False, {}
+    def get_commits(self):
+        """
+        @summary：获取当前构建下的代码变更记录
+        """
 
-                return True, ret["data"]
-            except:
-                self._log.error("abnormal: {}".format(r.text))
-                return False, {}
-        else:
-            self._log.error("unexpected status_code: {}" .format(r.text))
-            return False, {}
+        path = "/repository/api/build/commit/getCommitsByBuildId"
+        url = self.generate_url(path)
+        return self.do_get(url)
