@@ -62,6 +62,14 @@ def get_pipeline_start_user_name():
     return params.get("pipeline.start.user.name", None)
 
 
+def get_pipeline_creator():
+    return params.get("BK_CI_PIPELINE_CREATE_USER", None)
+
+
+def get_pipeline_modifier():
+    return params.get("BK_CI_PIPELINE_UPDATE_USER", None)
+
+
 def get_pipeline_time_start_mills():
     return params.get("pipeline.time.start", None)
 
@@ -160,6 +168,21 @@ def get_commits():
     client = OpenApi()
     return client.get_commits()
 
+
+def docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag, ticketId=None):
+    projectId = get_project_name()
+    buildId = get_pipeline_build_id()
+    pipelineId = get_pipeline_id()
+
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag, projectId, buildId, pipelineId, ticketId=ticketId)
+
+
+def get_docker_push_status(userId, taskId):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_docker_push_status(userId, taskId)
 
 if __name__ == "__main__":
     pass

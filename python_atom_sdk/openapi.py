@@ -198,3 +198,65 @@ class OpenApi():
         path = "/repository/api/build/commit/getCommitsByBuildId"
         url = self.generate_url(path)
         return self.do_get(url)
+
+    def docker_push(self, userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag, projectId, buildId, pipelineId, ticketId=None):
+        """
+        @summary: 从蓝盾仓库推送镜像到目标仓库
+        @param userId：用户ID 必填
+        @param srcImageName：源镜像名称 必填
+        @param srcImageTag：源镜像tag 必填
+        @param repoAddress：目标镜像仓库地址 必填
+        @param namespace：目标命名空间 必填
+        @param targetImageName：目的镜像名称 必填
+        @param targetImageTag：目的镜像tag 必填
+        @param projectId：项目ID 必填
+        @param buildId：构建ID 必填
+        @param pipelineId：流水线ID 必填
+
+        @param ticketId：凭证ID 非必填
+        """
+        path = "/image/api/build/image/common/push"
+        url = self.generate_url(path)
+
+        params = {
+            "userId": userId,
+            "srcImageName": srcImageName,
+            "srcImageTag": srcImageTag,
+            "repoAddress": repoAddress,
+            "namespace": namespace,
+            "targetImageName": targetImageName,
+            "targetImageTag": targetImageTag,
+            "projectId": projectId,
+            "buildId": buildId,
+            "pipelineId": pipelineId
+        }
+        if ticketId:
+            params["ticketId"] = ticketId
+
+        headers = self.header_auth
+        headers["Content-type"] = "application/json"
+
+        r = self.session.post(url, headers=headers, data=json.dumps(params))
+
+        if r.status_code == 200:
+            try:
+                ret = r.json()
+                if ret["status"] != 0:
+                    self._log.error("unexpected status: {}".format(r.text))
+                    return False, {}
+
+                return True, ret["data"]
+            except:
+                self._log.error("abnormal: {}".format(r.text))
+                return False, {}
+        else:
+            self._log.error("unexpected status_code: {}" .format(r.text))
+            return False, {}
+
+    def get_docker_push_status(self, userId, taskId):
+        """
+        @summary 根据任务ID获取推送镜像进度
+        """
+        path = "/image/api/build/image/common/query?userId={}&taskId={}".format(userId, taskId)
+        url = self.generate_url(path)
+        return self.do_get(url)
