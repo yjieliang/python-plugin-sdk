@@ -83,19 +83,24 @@ class OpenApi():
         else:
             r = self.session.get(url, headers=self.header_auth)
 
+        try:
+            content = r.text.encode("utf-8")
+        except:
+            content = r.text
+
         if r.status_code == 200:
             try:
                 ret = r.json()
                 if ret["status"] != 0:
-                    self._log.error("unexpected status: {}".format(r.text))
+                    self._log.error("unexpected status: {}".format(content))
                     return False, {}
 
                 return True, ret["data"]
             except:
-                self._log.error("abnormal: {}".format(r.text))
+                self._log.error("abnormal: {}".format(content))
                 return False, {}
         else:
-            self._log.error("unexpected status_code: {}" .format(r.text))
+            self._log.error("unexpected status_code: {}" .format(content))
             return False, {}
 
     def get_artifacts_url(self, file_src, file_path):
@@ -238,19 +243,24 @@ class OpenApi():
 
         r = self.session.post(url, headers=headers, data=json.dumps(params))
 
+        try:
+            content = r.text.encode("utf-8")
+        except:
+            content = r.text
+
         if r.status_code == 200:
             try:
                 ret = r.json()
                 if ret["status"] != 0:
-                    self._log.error("unexpected status: {}".format(r.text))
+                    self._log.error("unexpected status: {}".format(content))
                     return False, {}
 
                 return True, ret["data"]
             except:
-                self._log.error("abnormal: {}".format(r.text))
+                self._log.error("abnormal: {}".format(content))
                 return False, {}
         else:
-            self._log.error("unexpected status_code: {}" .format(r.text))
+            self._log.error("unexpected status_code: {}" .format(content))
             return False, {}
 
     def get_docker_push_status(self, userId, taskId):
@@ -260,3 +270,16 @@ class OpenApi():
         path = "/image/api/build/image/common/query?userId={}&taskId={}".format(userId, taskId)
         url = self.generate_url(path)
         return self.do_get(url)
+
+    def get_repo_info(self, identity, identity_type):
+        """
+        根据代码库别名，获取代码库详细地址
+        """
+        path = "/repository/api/build/repositories/"
+        params = {
+            "repositoryId": identity,
+            "repositoryType": identity_type
+        }
+        url = self.generate_url(path)
+
+        return self.do_get(url, params=params)

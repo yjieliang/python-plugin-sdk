@@ -184,5 +184,12 @@ def get_docker_push_status(userId, taskId):
     client = OpenApi()
     return client.get_docker_push_status(userId, taskId)
 
+
+def get_repo_info(identity, identity_type):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_repo_info(identity, identity_type)
+
+
 if __name__ == "__main__":
     pass
