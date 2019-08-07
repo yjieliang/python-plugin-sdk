@@ -126,15 +126,15 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_fie
 
     result, download_url_list = get_artifact_urls(file_src, file_path)
     if not result:
-        return False
+        return False, download_url_list
 
     if len(download_url_list) > 1:
         log.error("found multiple files, confused")
-        return False
+        return False, "found multiple files, confused"
 
     if len(download_url_list) == 0:
         log.error("can not find file, please check file_src & file_path")
-        return False
+        return False, "can not find file, please check file_src & file_path"
 
     return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field)
 
@@ -148,11 +148,14 @@ def download_file(file_src, file_path, file_name=None):
 
     result, download_url_list = get_artifact_urls(file_src, file_path)
     if not result:
-        return False
+        return False, download_url_list
 
     if len(download_url_list) > 1:
         log.error("found multiple files, confused")
-        return False
+        return False, "found multiple files, confused"
+    elif len(download_url_list) == 0:
+        log.error("can not find file: {}, {}".format(file_src, file_path))
+        return False, "can not find file: {}, {}".format(file_src, file_path)
 
     return client.download_file(download_url_list[0], file_name)
 
@@ -189,6 +192,12 @@ def get_repo_info(identity, identity_type):
     from .openapi import OpenApi
     client = OpenApi()
     return client.get_repo_info(identity, identity_type)
+
+
+def get_git_oauth(userId):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_git_oauth(userId)
 
 
 if __name__ == "__main__":

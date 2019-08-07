@@ -265,7 +265,7 @@ class OpenApi():
 
     def get_docker_push_status(self, userId, taskId):
         """
-        @summary 根据任务ID获取推送镜像进度
+        @summary：根据任务ID获取推送镜像进度
         """
         path = "/image/api/build/image/common/query?userId={}&taskId={}".format(userId, taskId)
         url = self.generate_url(path)
@@ -273,7 +273,7 @@ class OpenApi():
 
     def get_repo_info(self, identity, identity_type):
         """
-        根据代码库别名，获取代码库详细地址
+        @summary：根据代码库别名，获取代码库详细地址
         """
         path = "/repository/api/build/repositories/"
         params = {
@@ -283,3 +283,13 @@ class OpenApi():
         url = self.generate_url(path)
 
         return self.do_get(url, params=params)
+
+    def get_git_oauth(self, userId):
+        """
+        @summary：获取工蜂OAUTH信息
+        """
+        path = "/repository/api/build/oauth/git/{}".format(userId)
+
+        url = self.generate_url(path)
+
+        return self.do_get(url)
