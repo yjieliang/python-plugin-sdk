@@ -172,14 +172,16 @@ def get_commits():
     return client.get_commits()
 
 
-def docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag, ticketId=None):
+def docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag,
+                ticketId=None):
     projectId = get_project_name()
     buildId = get_pipeline_build_id()
     pipelineId = get_pipeline_id()
 
     from .openapi import OpenApi
     client = OpenApi()
-    return client.docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag, projectId, buildId, pipelineId, ticketId=ticketId)
+    return client.docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName,
+                              targetImageTag, projectId, buildId, pipelineId, ticketId=ticketId)
 
 
 def get_docker_push_status(userId, taskId):
@@ -198,6 +200,24 @@ def get_git_oauth(userId):
     from .openapi import OpenApi
     client = OpenApi()
     return client.get_git_oauth(userId)
+
+
+def send_rtx_notify(receivers, title, body):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.send_rtx_notify(receivers, title, body)
+
+
+def send_wechat_notify(receivers, body):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.send_wechat_notify(receivers, body)
+
+
+def send_email_notify(receivers, title, body, cc=[]):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.send_email_notify(receivers, title, body, cc)
 
 
 if __name__ == "__main__":

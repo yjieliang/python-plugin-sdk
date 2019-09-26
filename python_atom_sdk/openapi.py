@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
-
+import binascii
 import os
 import json
 import traceback
 import requests
 import requests_toolbelt as rt
+import json
 
 from . import setting
 from .bklog import getLogger
 
 
 class OpenApi():
-
     _log = getLogger()
 
     def __init__(self):
@@ -100,8 +100,39 @@ class OpenApi():
                 self._log.error("abnormal: {}".format(content))
                 return False, {}
         else:
-            self._log.error("unexpected status_code: {}" .format(content))
+            self._log.error("unexpected status_code: {}".format(content))
             return False, {}
+
+    def do_post(self, url, header=None, message=None):
+        for key, val in header.items():
+            self.header_auth[key] = val
+
+        with self.session as s:
+            if message:
+                r = s.post(url, headers=self.header_auth, data=json.dumps(message))
+            else:
+                r = s.post(url, headers=self.header_auth)
+
+            try:
+                content = r.text.encode("utf-8")
+            except:
+                content = r.text
+
+            if r.status_code == 200:
+                try:
+                    ret = r.json()
+                    if ret["status"] != 0:
+                        self._log.error("unexpected status: {}".format(ret["message"]))
+                        return False, {}
+
+                    return True, ret["data"]
+                except:
+                    self._log.error("abnormal: {}".format(content))
+                    return False, {}
+            else:
+                self._log.error(r.status_code)
+                self._log.error("unexpected message: {}".format(r.json()["message"]))
+                return False, {}
 
     def get_artifacts_url(self, file_src, file_path):
         """
@@ -113,7 +144,7 @@ class OpenApi():
         params = {
             "artifactoryType": file_src,
             "path": file_path,
-            "ttl": 3600*24
+            "ttl": 3600 * 24
         }
         url = self.generate_url(path)
         return self.do_get(url, params=params)
@@ -204,7 +235,8 @@ class OpenApi():
         url = self.generate_url(path)
         return self.do_get(url)
 
-    def docker_push(self, userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag, projectId, buildId, pipelineId, ticketId=None):
+    def docker_push(self, userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag,
+                    projectId, buildId, pipelineId, ticketId=None):
         """
         @summary: 从蓝盾仓库推送镜像到目标仓库
         @param userId：用户ID 必填
@@ -260,7 +292,7 @@ class OpenApi():
                 self._log.error("abnormal: {}".format(content))
                 return False, {}
         else:
-            self._log.error("unexpected status_code: {}" .format(content))
+            self._log.error("unexpected status_code: {}".format(content))
             return False, {}
 
     def get_docker_push_status(self, userId, taskId):
@@ -293,3 +325,70 @@ class OpenApi():
         url = self.generate_url(path)
 
         return self.do_get(url)
+
+    def send_rtx_notify(self, receivers, title, body):
+        """
+        @summary：发送企业微信通知
+        :param receivers: 接收人集合
+        :param body: 通知内容
+        :param title: 通知标题
+        :return:
+        """
+        path = "/notify/api/build/notifies/rtx"
+
+        header = {
+            "Content-type": "application/json"
+        }
+
+        message = {
+            "receivers": receivers, "body": body, "sender": "", "title": title, "priority": "-1",
+            "source": 0
+        }
+        url = self.generate_url(path)
+        ret, msg = self.do_post(url, header, message)
+
+        return ret
+
+    def send_wechat_notify(self, receivers, body):
+        """
+        @summary：发送微信通知
+        :param receivers: 接收人集合
+        :param body: 通知内容
+        :return:
+        """
+        path = "/notify/api/build/notifies/wechat"
+
+        header = {
+            "Content-type": "application/json"
+        }
+
+        message = {
+            "receivers": receivers, "body": body
+        }
+        url = self.generate_url(path)
+        ret, msg = self.do_post(url, header, message)
+
+        return ret
+
+    def send_email_notify(self, receivers, title, body, cc=[]):
+        """
+        @summary：发送邮件通知
+        :param receivers: 接收人集合
+        :param cc: 抄送人集合
+        :param body: 通知内容
+        :param title: 通知标题
+        :return:
+        """
+        path = "/notify/api/build/notifies/email"
+
+        header = {
+            "Content-type": "application/json"
+        }
+
+        message = {
+            "receivers": receivers, "cc": cc, "title": title, "body": body
+        }
+        url = self.generate_url(path)
+        ret, msg = self.do_post(url, header, message)
+
+        return ret
