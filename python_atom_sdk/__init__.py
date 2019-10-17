@@ -113,7 +113,7 @@ def set_output(output):
     setOutput.set_output(output)
 
 
-def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_field="file"):
+def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_field="file", timeout=300):
     """
     @summary: 上传构件到第三方平台
     """
@@ -132,7 +132,7 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_fie
         log.error("can not find file, please check file_src & file_path")
         return False, "can not find file, please check file_src & file_path"
 
-    return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field)
+    return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field, timeout=timeout)
 
 
 def download_file(file_src, file_path, file_name=None):

@@ -75,11 +75,11 @@ class OpenApi():
         """
         return "http://{}/{}".format(self.gateway, path.lstrip("/"))
 
-    def do_get(self, url, params=None):
+    def do_get(self, url, params=None, timeout=60):
         if params:
-            r = self.session.get(url, headers=self.header_auth, params=params)
+            r = self.session.get(url, headers=self.header_auth, params=params, timeout=timeout)
         else:
-            r = self.session.get(url, headers=self.header_auth)
+            r = self.session.get(url, headers=self.header_auth, timeout=timeout)
 
         try:
             content = r.text.encode("utf-8")
@@ -101,15 +101,15 @@ class OpenApi():
             self._log.error("unexpected status_code: {}".format(content))
             return False, {}
 
-    def do_post(self, url, header=None, message=None):
+    def do_post(self, url, header=None, message=None, timeout=120):
         for key, val in header.items():
             self.header_auth[key] = val
 
         with self.session as s:
             if message:
-                r = s.post(url, headers=self.header_auth, data=json.dumps(message))
+                r = s.post(url, headers=self.header_auth, data=json.dumps(message), timeout=timeout)
             else:
-                r = s.post(url, headers=self.header_auth)
+                r = s.post(url, headers=self.header_auth, timeout=timeout)
 
             try:
                 content = r.text.encode("utf-8")
@@ -190,7 +190,7 @@ class OpenApi():
 
         return True, file_path_local
 
-    def upload_file(self, download_url, upload_url, params={}, headers={}, file_field="file"):
+    def upload_file(self, download_url, upload_url, params={}, headers={}, file_field="file", timeout=300):
         """
         @summary: 从仓库获取构件，并推送到第三方系统
         """
@@ -212,7 +212,7 @@ class OpenApi():
         }
         _headers.update(headers)
 
-        response = requests.post(upload_url, data=m, headers=_headers)
+        response = requests.post(upload_url, data=m, headers=_headers, timeout=timeout)
         return response.json()
 
     def get_credential(self, credential_id):
