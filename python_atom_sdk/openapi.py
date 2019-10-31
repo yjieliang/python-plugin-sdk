@@ -368,13 +368,14 @@ class OpenApi():
 
         return ret
 
-    def send_email_notify(self, receivers, title, body, cc=[]):
+    def send_email_notify(self, receivers, title, body, cc=[], content_format="TEXT"):
         """
         @summary：发送邮件通知
         :param receivers: 接收人集合
         :param cc: 抄送人集合
         :param body: 通知内容
         :param title: 通知标题
+        :param content_format: TEXT普通文本  HTML html
         :return:
         """
         path = "/notify/api/build/notifies/email"
@@ -383,8 +384,13 @@ class OpenApi():
             "Content-type": "application/json"
         }
 
+        _format = {
+            "TEXT": 0,
+            "HTML": 1
+        }
+
         message = {
-            "receivers": receivers, "cc": cc, "title": title, "body": body
+            "receivers": receivers, "cc": cc, "title": title, "body": body, "format": _format[content_format]
         }
         url = self.generate_url(path)
         ret, msg = self.do_post(url, header, message)

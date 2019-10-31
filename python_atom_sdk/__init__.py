@@ -210,10 +210,10 @@ def send_wechat_notify(receivers, body):
     return client.send_wechat_notify(receivers, body)
 
 
-def send_email_notify(receivers, title, body, cc=[]):
+def send_email_notify(receivers, title, body, cc=[], content_format="TEXT"):
     from .openapi import OpenApi
     client = OpenApi()
-    return client.send_email_notify(receivers, title, body, cc)
+    return client.send_email_notify(receivers, title, body, cc, content_format)
 
 
 if __name__ == "__main__":
