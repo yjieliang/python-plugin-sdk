@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from .bklog import logger
+from .bklog import logger, getLogger
 from .input import ParseParams
 from .output import SetOutput
 from .const import Status, OutputTemplateType, OutputFieldType, OutputReportType

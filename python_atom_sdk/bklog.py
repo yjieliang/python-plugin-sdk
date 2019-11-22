@@ -10,6 +10,13 @@ LOG_LEVEL = logging.DEBUG
 BK_CI_PLACEHOLDER = "BK_CI_PLACEHOLDER"
 
 
+def getLogger():
+    """
+    兼容老版本的方法
+    """
+    return logger().logger
+
+
 class MyLoggerAdapter(logging.LoggerAdapter):
 
     def process(self, msg, kwargs):
