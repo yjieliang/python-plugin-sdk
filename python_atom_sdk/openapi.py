@@ -6,11 +6,11 @@ import requests_toolbelt as rt
 import json
 
 from . import setting
-from .bklog import getLogger
+from .bklog import logger
 
 
 class OpenApi():
-    _log = getLogger()
+    _log = logger()
 
     def __init__(self):
         sdk_json = self.get_sdk_json()
