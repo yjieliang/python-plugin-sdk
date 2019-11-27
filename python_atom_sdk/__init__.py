@@ -215,6 +215,11 @@ def send_email_notify(receivers, title, body, cc=[], content_format="TEXT"):
     client = OpenApi()
     return client.send_email_notify(receivers, title, body, cc, content_format)
 
+# ipt专用
+def get_commit_build_artifactory_info(pipeline_id, user_id, commit_id):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_commit_build_artifactory_info(pipeline_id, user_id, commit_id)
 
 if __name__ == "__main__":
     pass

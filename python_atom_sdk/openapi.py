@@ -396,3 +396,10 @@ class OpenApi():
         ret, msg = self.do_post(url, header, message)
 
         return ret
+
+    def get_commit_build_artifactory_info(self, pipeline_id, user_id, commit_id):
+        path = "/process/api/build/ipt/repo/repositories/project/{}/pipeline/{}/commit/{}/artifactorytInfo"\
+            .format(pipeline_id, user_id, commit_id)
+        url = self.generate_url(path)
+        ret, msg = self.do_get(url)
+        return ret
