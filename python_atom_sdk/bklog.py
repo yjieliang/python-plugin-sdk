@@ -57,17 +57,20 @@ class logger():
             extra_dict = {"bk_ci_placeholder": BK_CI_PLACEHOLDER}
             self.logger = MyLoggerAdapter(init_logger, extra_dict)
 
-    def debug(self, msg):
-        self.logger.debug(msg)
+    def debug(self, msg, *args, **kwargs):
+        self.logger.debug(msg, *args, **kwargs)
 
     def info(self, msg, *args, **kwargs):
         self.logger.info(msg, *args, **kwargs)
 
-    def warning(self, msg):
-        self.logger.warning(msg)
+    def warning(self, msg, *args, **kwargs):
+        self.logger.warning(msg, *args, **kwargs)
 
-    def error(self, msg):
-        self.logger.error(msg)
+    def error(self, msg, *args, **kwargs):
+        self.logger.error(msg, *args, **kwargs)
+
+    def critical(self, msg, *args, **kwargs):
+        self.logger.critical(msg, *args, **kwargs)
 
     def command(self, command):
         self.logger.info(command, extra={"bk_ci_placeholder": "command"})
