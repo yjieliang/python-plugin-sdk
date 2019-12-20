@@ -93,16 +93,24 @@ def get_sensitive_conf(key):
         return None
 
 
-def get_artifact_urls(file_src, file_path):
+def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None, buildNo=None):
+    if projectId and not pipelineId:
+        return False, "pipelineId is null"
+    if pipelineId and not projectId:
+        return False, "projectId is null"
     from .openapi import OpenApi
     client = OpenApi()
-    return client.get_artifacts_url(file_src, file_path)
+    return client.get_artifacts_url(file_src, file_path, projectId=projectId, pipelineId=pipelineId, buildNo=buildNo)
 
 
-def get_artifacts_properties(file_src, file_path):
+def get_artifacts_properties(file_src, file_path, projectId=None, pipelineId=None, buildNo=None):
+    if projectId and not pipelineId:
+        return False, "pipelineId is null"
+    if pipelineId and not projectId:
+        return False, "projectId is null"
     from .openapi import OpenApi
     client = OpenApi()
-    return client.get_artifacts_properties(file_src, file_path)
+    return client.get_artifacts_properties(file_src, file_path, projectId=projectId, pipelineId=pipelineId, buildNo=buildNo)
 
 
 def set_output(output):
@@ -135,14 +143,14 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_fie
     return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field, timeout=timeout)
 
 
-def download_file(file_src, file_path, file_name=None):
+def download_file(file_src, file_path, file_name=None, projectId=None, pipelineId=None, buildNo=None):
     """
     @summary: 从仓库下载构件到本地
     """
     from .openapi import OpenApi
     client = OpenApi()
 
-    result, download_url_list = get_artifact_urls(file_src, file_path)
+    result, download_url_list = get_artifact_urls(file_src, file_path, projectId=projectId, pipelineId=pipelineId, buildNo=buildNo)
     if not result:
         return False, download_url_list
 

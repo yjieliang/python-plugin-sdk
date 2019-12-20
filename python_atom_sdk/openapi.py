@@ -86,6 +86,8 @@ class OpenApi():
         except:
             content = r.text
 
+        # self._log.debug(r.status_code)
+        # self._log.debug(content)
         if r.status_code == 200:
             try:
                 ret = r.json()
@@ -132,7 +134,7 @@ class OpenApi():
                 self._log.error("unexpected message: {}".format(r.json()["message"]))
                 return False, {}
 
-    def get_artifacts_url(self, file_src, file_path):
+    def get_artifacts_url(self, file_src, file_path, projectId=None, pipelineId=None, buildNo=None):
         """
         @summary: 获取已归档构件的下载链接
         @param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
@@ -144,10 +146,21 @@ class OpenApi():
             "path": file_path,
             "ttl": 3600 * 24
         }
+        if projectId:
+            params["projectId"] = projectId
+        if pipelineId:
+            params["pipelineId"] = pipelineId
+        if projectId and pipelineId:
+            if buildNo:
+                params["buildNo"] = buildNo
+            else:
+                params["buildNo"] = "-1"  # 最近一次构建
         url = self.generate_url(path)
+        # self._log.debug(url)
+        # self._log.debug(params)
         return self.do_get(url, params=params)
 
-    def get_artifacts_properties(self, file_src, file_path):
+    def get_artifacts_properties(self, file_src, file_path, projectId=None, pipelineId=None, buildNo=None):
         """
         @summary: 获取已归档构件的元数据
         @param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
@@ -158,7 +171,18 @@ class OpenApi():
             "artifactoryType": file_src,
             "path": file_path
         }
+        if projectId:
+            params["projectId"] = projectId
+        if pipelineId:
+            params["pipelineId"] = pipelineId
+        if projectId and pipelineId:
+            if buildNo:
+                params["buildNo"] = buildNo
+            else:
+                params["buildNo"] = "-1"
         url = self.generate_url(path)
+        # self._log.debug(url)
+        # self._log.debug(params)
         return self.do_get(url, params=params)
 
     def download_file(self, file_url, file_name=None):
