@@ -5,7 +5,7 @@ import logging
 
 
 LOG_NAME = "ATOM_LOG"
-LOG_FORMAT = "%(bk_ci_placeholder)s %(message)s"
+LOG_FORMAT = "%(bk_ci_placeholder)s%(message)s"
 LOG_LEVEL = logging.DEBUG
 BK_CI_PLACEHOLDER = "BK_CI_PLACEHOLDER"
 
