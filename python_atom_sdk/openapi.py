@@ -427,3 +427,21 @@ class OpenApi():
         url = self.generate_url(path)
         ret, msg = self.do_get(url)
         return ret
+
+    def set_properties(self, file_src, file_path, properties):
+        """
+        @summary: 设置归档文件元数据
+        :param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
+        :param file_path: 构件的相对路径
+        :param properties: 新设置的元数据，map类型
+        """
+        path = "artifactory/api/build/artifactories/properties?artifactoryType={}&path={}"\
+            .format(file_src, file_path)
+        url = self.generate_url(path)
+
+        header = {
+            "Content-type": "application/json"
+        }
+
+        ret, msg = self.do_post(url, header, properties)
+        return ret

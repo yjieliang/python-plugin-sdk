@@ -110,7 +110,8 @@ def get_artifacts_properties(file_src, file_path, projectId=None, pipelineId=Non
         return False, "projectId is null"
     from .openapi import OpenApi
     client = OpenApi()
-    return client.get_artifacts_properties(file_src, file_path, projectId=projectId, pipelineId=pipelineId, buildNo=buildNo)
+    return client.get_artifacts_properties(file_src, file_path, projectId=projectId, pipelineId=pipelineId,
+                                           buildNo=buildNo)
 
 
 def set_output(output):
@@ -140,7 +141,8 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_fie
         log.error("can not find file, please check file_src & file_path")
         return False, "can not find file, please check file_src & file_path"
 
-    return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field, timeout=timeout)
+    return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field,
+                              timeout=timeout)
 
 
 def download_file(file_src, file_path, file_name=None, projectId=None, pipelineId=None, buildNo=None):
@@ -150,7 +152,8 @@ def download_file(file_src, file_path, file_name=None, projectId=None, pipelineI
     from .openapi import OpenApi
     client = OpenApi()
 
-    result, download_url_list = get_artifact_urls(file_src, file_path, projectId=projectId, pipelineId=pipelineId, buildNo=buildNo)
+    result, download_url_list = get_artifact_urls(file_src, file_path, projectId=projectId, pipelineId=pipelineId,
+                                                  buildNo=buildNo)
     if not result:
         return False, download_url_list
 
@@ -223,11 +226,23 @@ def send_email_notify(receivers, title, body, cc=[], content_format="TEXT"):
     client = OpenApi()
     return client.send_email_notify(receivers, title, body, cc, content_format)
 
+
 # ipt专用
 def get_commit_build_artifactory_info(pipeline_id, user_id, commit_id):
     from .openapi import OpenApi
     client = OpenApi()
     return client.get_commit_build_artifactory_info(pipeline_id, user_id, commit_id)
+
+
+def set_properties(file_src, file_path, properties):
+    from .openapi import OpenApi
+    client = OpenApi()
+    if str(file_src) == "PIPELINE":
+        file_path = "/"+get_pipeline_id()+"/"+get_pipeline_build_id()+"/"+str(file_path).replace("/", "", 1)
+    elif str(file_src) == "CUSTOM_DIR":
+        file_path = "/"+str(file_path).replace("/", "", 1)
+    return client.set_properties(file_src, file_path, properties)
+
 
 if __name__ == "__main__":
     pass
