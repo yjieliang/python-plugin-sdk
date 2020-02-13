@@ -425,8 +425,7 @@ class OpenApi():
         path = "/process/api/build/ipt/repo/pipeline/{}/commit/{}/artifactorytInfo?userId={}"\
             .format(pipeline_id, commit_id, user_id)
         url = self.generate_url(path)
-        ret, msg = self.do_get(url)
-        return ret
+        return self.do_get(url)
 
     def set_properties(self, file_src, file_path, properties):
         """
