@@ -228,10 +228,10 @@ def send_email_notify(receivers, title, body, cc=[], content_format="TEXT"):
 
 
 # ipt专用
-def get_commit_build_artifactory_info(pipeline_id, user_id, commit_id):
+def get_commit_build_artifactory_info(pipeline_id, user_id, commit_id, file_path):
     from .openapi import OpenApi
     client = OpenApi()
-    return client.get_commit_build_artifactory_info(pipeline_id, user_id, commit_id)
+    return client.get_commit_build_artifactory_info(pipeline_id, user_id, commit_id, file_path)
 
 
 def set_properties(file_src, file_path, properties):
