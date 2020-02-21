@@ -421,9 +421,11 @@ class OpenApi():
 
         return ret
 
-    def get_commit_build_artifactory_info(self, pipeline_id, user_id, commit_id):
+    def get_commit_build_artifactory_info(self, pipeline_id, user_id, commit_id, file_path):
         path = "/process/api/build/ipt/repo/pipeline/{}/commit/{}/artifactorytInfo?userId={}"\
             .format(pipeline_id, commit_id, user_id)
+        if file_path:
+            path = path + "&filePath=" + file_path
         url = self.generate_url(path)
         return self.do_get(url)
 
