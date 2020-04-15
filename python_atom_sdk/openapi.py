@@ -225,7 +225,7 @@ class OpenApi():
             return result
 
         fields = {
-            file_field: (filepath, open(filepath, "rb").read())
+            file_field: (filepath, open(filepath, "rb"), "text/plain")
         }
         fields.update(params)
         m = rt.MultipartEncoder(fields=fields)
