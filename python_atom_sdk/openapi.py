@@ -35,11 +35,12 @@ class OpenApi():
         """
         @summary：获取sdk配置
         """
-        if not os.path.exists(setting.BK_SDK_JSON):
+        sdk_path = os.path.join(os.environ.get(setting.BK_DATA_DIR, None), setting.BK_SDK_JSON)
+        if not os.path.exists(sdk_path):
             self._log.error("[openapi]init error: sdk json do not exist")
             exit(-1)
 
-        with open(setting.BK_SDK_JSON, 'r') as f:
+        with open(sdk_path, 'r') as f:
             content = f.read()
         if not content:
             self._log.error("[openapi]init error: sdk json is null")
