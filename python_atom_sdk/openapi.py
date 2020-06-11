@@ -14,6 +14,7 @@ class OpenApi():
 
     def __init__(self):
         sdk_json = self.get_sdk_json()
+        # self._log.info(sdk_json)
 
         self.gateway = sdk_json.get("gateway", None)
         self.header_auth = {
@@ -74,9 +75,13 @@ class OpenApi():
         """
         @summary：组装访问openapi的url
         """
-        return "http://{}/{}".format(self.gateway, path.lstrip("/"))
+        if self.gateway.startswith("http://") or self.gateway.startswith("https://"):
+            return "{}/{}".format(self.gateway, path.lstrip("/"))
+        else:
+            return "http://{}/{}".format(self.gateway, path.lstrip("/"))
 
     def do_get(self, url, params=None, timeout=60):
+        # self._log.debug(url)
         if params:
             r = self.session.get(url, headers=self.header_auth, params=params, timeout=timeout)
         else:
