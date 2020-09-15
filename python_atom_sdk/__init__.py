@@ -3,7 +3,7 @@
 from .bklog import logger, getLogger
 from .input import ParseParams
 from .output import SetOutput
-from .const import Status, OutputTemplateType, OutputFieldType, OutputReportType
+from .const import Status, OutputTemplateType, OutputFieldType, OutputReportType, OutputErrorType
 
 log = logger()
 parseParamsObj = ParseParams()
@@ -12,6 +12,7 @@ status = Status()
 output_template_type = OutputTemplateType()
 output_field_type = OutputFieldType()
 output_report_type = OutputReportType()
+output_error_type = OutputErrorType()
 
 
 def get_input():
