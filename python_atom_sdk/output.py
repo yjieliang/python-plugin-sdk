@@ -52,6 +52,10 @@ class SetOutput():
                 self._log.error("[check output error]invalid field type: {}".format(field_type))
                 exit(-1)
 
+        output_error_type = output.get("errorType", None)
+        if not output_error_type or output_error_type not in setting.BK_OUTPUT_ERROR_TYPE.values():
+            self._log.error("[check output error]invalid output_error_type:{}".format(output_error_type))
+
         return
 
     def set_output(self, output):
