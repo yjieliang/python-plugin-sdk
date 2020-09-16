@@ -35,3 +35,11 @@ class OutputReportType:
     """
     INTERNAL = setting.BK_OUTPUT_REPORT_TYPR.get("INTERNAL", None)
     THIRDPARTY = setting.BK_OUTPUT_REPORT_TYPR.get("THIRDPARTY", None)
+
+class OutputErrorType:
+    """
+    @summary:  插件输出字段类型为报告时，报告类型
+    """
+    USER = setting.BK_OUTPUT_ERROR_TYPE.get("USER", None)
+    THIRD_PARTY = setting.BK_OUTPUT_ERROR_TYPE.get("THIRD_PARTY", None)
+    PLUGIN = setting.BK_OUTPUT_ERROR_TYPE.get("PLUGIN", None)
