@@ -36,6 +36,7 @@ class OutputReportType:
     INTERNAL = setting.BK_OUTPUT_REPORT_TYPR.get("INTERNAL", None)
     THIRDPARTY = setting.BK_OUTPUT_REPORT_TYPR.get("THIRDPARTY", None)
 
+
 class OutputErrorType:
     """
     @summary:  插件输出字段类型为报告时，报告类型
