@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import os
 import traceback
+import json
 import requests
 import requests_toolbelt as rt
-import json
 
 from . import setting
-from .bklog import logger
+from .bklog import BkLogger
 
 
 class OpenApi():
-    _log = logger()
+    _log = BkLogger()
 
     def __init__(self):
         sdk_json = self.get_sdk_json()
@@ -41,8 +41,8 @@ class OpenApi():
             self._log.error("[openapi]init error: sdk json do not exist")
             exit(-1)
 
-        with open(sdk_path, 'r') as f:
-            content = f.read()
+        with open(sdk_path, 'r') as f_sdk:
+            content = f_sdk.read()
         if not content:
             self._log.error("[openapi]init error: sdk json is null")
             exit(-1)
@@ -56,7 +56,10 @@ class OpenApi():
                 exit(-1)
 
             return sdk_json
-        except:
+        except TypeError as _e:
+            self._log.error("[openapi]parse sdk json error: type error, sdk.json is {}" .format(content))
+            exit(-1)
+        else:
             traceback.print_exc()
             self._log.error("[openapi]parse sdk json error")
             exit(-1)
@@ -83,26 +86,31 @@ class OpenApi():
     def do_get(self, url, params=None, timeout=60):
         # self._log.debug(url)
         if params:
-            r = self.session.get(url, headers=self.header_auth, params=params, timeout=timeout)
+            res = self.session.get(url, headers=self.header_auth, params=params, timeout=timeout)
         else:
-            r = self.session.get(url, headers=self.header_auth, timeout=timeout)
+            res = self.session.get(url, headers=self.header_auth, timeout=timeout)
 
         try:
-            content = r.text.encode("utf-8")
-        except:
-            content = r.text
+            content = res.text.encode("utf-8")
+        except AttributeError as _e:
+            content = res.text
+        else:
+            content = res.text
 
         # self._log.debug(r.status_code)
         # self._log.debug(content)
-        if r.status_code == 200:
+        if res.status_code == 200:
             try:
-                ret = r.json()
+                ret = res.json()
                 if ret["status"] != 0:
                     self._log.error("unexpected status: {}".format(content))
                     return False, {}
 
                 return True, ret["data"]
-            except:
+            except TimeoutError as _e:
+                self._log.error("timeout error")
+                return False, {}
+            else:
                 self._log.error("abnormal: {}".format(content))
                 return False, {}
         else:
@@ -113,34 +121,39 @@ class OpenApi():
         for key, val in header.items():
             self.header_auth[key] = val
 
-        with self.session as s:
+        with self.session as session:
             if message:
-                r = s.post(url, headers=self.header_auth, data=json.dumps(message), timeout=timeout)
+                res = session.post(url, headers=self.header_auth, data=json.dumps(message), timeout=timeout)
             else:
-                r = s.post(url, headers=self.header_auth, timeout=timeout)
+                res = session.post(url, headers=self.header_auth, timeout=timeout)
 
             try:
-                content = r.text.encode("utf-8")
-            except:
-                content = r.text
+                content = res.text.encode("utf-8")
+            except AttributeError as _e:
+                content = res.text
+            else:
+                content = res.text
 
-            if r.status_code == 200:
+            if res.status_code == 200:
                 try:
-                    ret = r.json()
+                    ret = res.json()
                     if ret["status"] != 0:
                         self._log.error("unexpected status: {}".format(ret["message"]))
                         return False, {}
 
                     return True, ret["data"]
-                except:
+                except TimeoutError as _e:
+                    self._log.error("timeout error")
+                    return False, {}
+                else:
                     self._log.error("abnormal: {}".format(content))
                     return False, {}
             else:
-                self._log.error(r.status_code)
-                self._log.error("unexpected message: {}".format(r.json()["message"]))
+                self._log.error(res.status_code)
+                self._log.error("unexpected message: {}".format(res.json()["message"]))
                 return False, {}
 
-    def get_artifacts_url(self, file_src, file_path, projectId=None, pipelineId=None, buildNo=None):
+    def get_artifacts_url(self, file_src, file_path, project_id=None, pipeline_id=None, build_no=None):
         """
         @summary: 获取已归档构件的下载链接
         @param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
@@ -152,13 +165,13 @@ class OpenApi():
             "path": file_path,
             "ttl": 3600 * 24
         }
-        if projectId:
-            params["projectId"] = projectId
-        if pipelineId:
-            params["pipelineId"] = pipelineId
-        if projectId and pipelineId:
-            if buildNo:
-                params["buildNo"] = buildNo
+        if project_id:
+            params["projectId"] = project_id
+        if pipeline_id:
+            params["pipelineId"] = pipeline_id
+        if project_id and pipeline_id:
+            if build_no:
+                params["buildNo"] = build_no
             else:
                 params["buildNo"] = "-1"  # 最近一次构建
         url = self.generate_url(path)
@@ -166,7 +179,7 @@ class OpenApi():
         # self._log.debug(params)
         return self.do_get(url, params=params)
 
-    def get_artifacts_properties(self, file_src, file_path, projectId=None, pipelineId=None, buildNo=None):
+    def get_artifacts_properties(self, file_src, file_path, project_id=None, pipeline_id=None, build_no=None):
         """
         @summary: 获取已归档构件的元数据
         @param file_src：构件源 PIPELINE 从本次已归档构件中获取, CUSTOM_DIR 从自定义版本仓库中获取
@@ -177,13 +190,13 @@ class OpenApi():
             "artifactoryType": file_src,
             "path": file_path
         }
-        if projectId:
-            params["projectId"] = projectId
-        if pipelineId:
-            params["pipelineId"] = pipelineId
-        if projectId and pipelineId:
-            if buildNo:
-                params["buildNo"] = buildNo
+        if project_id:
+            params["projectId"] = project_id
+        if pipeline_id:
+            params["pipelineId"] = pipeline_id
+        if project_id and pipeline_id:
+            if build_no:
+                params["buildNo"] = build_no
             else:
                 params["buildNo"] = "-1"
         url = self.generate_url(path)
@@ -198,11 +211,11 @@ class OpenApi():
         @param file_name: 本地储存的文件名，选填
         @ret file_path_local: 下载后存储的本地路径
         """
-        r = self.session.get(file_url, headers=self.header_auth, stream=True)
+        res = self.session.get(file_url, headers=self.header_auth, stream=True)
 
-        if r.status_code != 200:
+        if res.status_code != 200:
             self._log.error("download file failed, status_code is {}".format(r.status_code))
-            return False, r.status_code
+            return False, res.status_code
 
         if not file_name:
             file_url_list = file_url.split("?", 1)
@@ -213,14 +226,14 @@ class OpenApi():
         if not os.path.exists(file_path_dir):
             os.makedirs(file_path_dir)
 
-        with open(file_path_local, 'wb') as f:
-            for chunk in r.iter_content(chunk_size=512):
+        with open(file_path_local, 'wb') as f_file:
+            for chunk in res.iter_content(chunk_size=512):
                 if chunk:
-                    f.write(chunk)
+                    f_file.write(chunk)
 
         return True, file_path_local
 
-    def upload_file(self, download_url, upload_url, params={}, headers={}, file_field="file", timeout=300):
+    def upload_file(self, download_url, upload_url, params=None, headers=None, file_field="file", timeout=300):
         """
         @summary: 从仓库获取构件，并推送到第三方系统
         """
@@ -234,15 +247,15 @@ class OpenApi():
             file_field: (filepath, open(filepath, "rb"), "text/plain")
         }
         fields.update(params)
-        m = rt.MultipartEncoder(fields=fields)
+        multipart_encoder = rt.MultipartEncoder(fields=fields)
 
         _headers = {
-            "Content-Type": m.content_type,
+            "Content-Type": multipart_encoder.content_type,
             "accept": "application/json"
         }
         _headers.update(headers)
 
-        response = requests.post(upload_url, data=m, headers=_headers, timeout=timeout)
+        response = requests.post(upload_url, data=multipart_encoder, headers=_headers, timeout=timeout)
         return response.json()
 
     def get_credential(self, credential_id):
@@ -263,8 +276,8 @@ class OpenApi():
         url = self.generate_url(path)
         return self.do_get(url)
 
-    def docker_push(self, userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag,
-                    projectId, buildId, pipelineId, ticketId=None):
+    def docker_push(self, user_id, src_image_name, src_image_tag, repo_address, namespace, target_image_name, 
+                    target_image_tag, project_id, build_id, pipeline_id, ticket_id=None):
         """
         @summary: 从蓝盾仓库推送镜像到目标仓库
         @param userId：用户ID 必填
@@ -284,50 +297,55 @@ class OpenApi():
         url = self.generate_url(path)
 
         params = {
-            "userId": userId,
-            "srcImageName": srcImageName,
-            "srcImageTag": srcImageTag,
-            "repoAddress": repoAddress,
+            "userId": user_id,
+            "srcImageName": src_image_name,
+            "srcImageTag": src_image_tag,
+            "repoAddress": repo_address,
             "namespace": namespace,
-            "targetImageName": targetImageName,
-            "targetImageTag": targetImageTag,
-            "projectId": projectId,
-            "buildId": buildId,
-            "pipelineId": pipelineId
+            "targetImageName": target_image_name,
+            "targetImageTag": target_image_tag,
+            "projectId": project_id,
+            "buildId": build_id,
+            "pipelineId": pipeline_id
         }
-        if ticketId:
-            params["ticketId"] = ticketId
+        if ticket_id:
+            params["ticketId"] = ticket_id
 
         headers = self.header_auth
         headers["Content-type"] = "application/json"
 
-        r = self.session.post(url, headers=headers, data=json.dumps(params))
+        res = self.session.post(url, headers=headers, data=json.dumps(params))
 
         try:
-            content = r.text.encode("utf-8")
-        except:
-            content = r.text
+            content = res.text.encode("utf-8")
+        except AttributeError as _e:
+            content = res.text
+        else:
+            content = res.text
 
-        if r.status_code == 200:
+        if res.status_code == 200:
             try:
-                ret = r.json()
+                ret = res.json()
                 if ret["status"] != 0:
                     self._log.error("unexpected status: {}".format(content))
                     return False, {}
 
                 return True, ret["data"]
-            except:
+            except TypeError as _e:
+                self._log.error("abnormal: {}".format(content))
+                return False, {}
+            else:
                 self._log.error("abnormal: {}".format(content))
                 return False, {}
         else:
             self._log.error("unexpected status_code: {}".format(content))
             return False, {}
 
-    def get_docker_push_status(self, userId, taskId):
+    def get_docker_push_status(self, user_id, task_id):
         """
         @summary：根据任务ID获取推送镜像进度
         """
-        path = "/image/api/build/image/common/query?userId={}&taskId={}".format(userId, taskId)
+        path = "/image/api/build/image/common/query?userId={}&taskId={}".format(user_id, task_id)
         url = self.generate_url(path)
         return self.do_get(url)
 
@@ -344,11 +362,11 @@ class OpenApi():
 
         return self.do_get(url, params=params)
 
-    def get_git_oauth(self, userId):
+    def get_git_oauth(self, user_id):
         """
         @summary：获取工蜂OAUTH信息
         """
-        path = "/repository/api/build/oauth/git/{}".format(userId)
+        path = "/repository/api/build/oauth/git/{}".format(user_id)
 
         url = self.generate_url(path)
 
@@ -373,7 +391,7 @@ class OpenApi():
             "source": 0
         }
         url = self.generate_url(path)
-        ret, msg = self.do_post(url, header, message)
+        ret, _msg = self.do_post(url, header, message)
 
         return ret
 
@@ -394,11 +412,11 @@ class OpenApi():
             "receivers": receivers, "body": body
         }
         url = self.generate_url(path)
-        ret, msg = self.do_post(url, header, message)
+        ret, _msg = self.do_post(url, header, message)
 
         return ret
 
-    def send_email_notify(self, receivers, title, body, cc=[], content_format="TEXT"):
+    def send_email_notify(self, receivers, title, body, ccs=None, content_format="TEXT"):
         """
         @summary：发送邮件通知
         :param receivers: 接收人集合
@@ -418,12 +436,14 @@ class OpenApi():
             "TEXT": 0,
             "HTML": 1
         }
+        if not ccs:
+            ccs = []
 
         message = {
-            "receivers": receivers, "cc": cc, "title": title, "body": body, "format": _format[content_format]
+            "receivers": receivers, "cc": ccs, "title": title, "body": body, "format": _format[content_format]
         }
         url = self.generate_url(path)
-        ret, msg = self.do_post(url, header, message)
+        ret, _msg = self.do_post(url, header, message)
 
         return ret
 
@@ -450,5 +470,5 @@ class OpenApi():
             "Content-type": "application/json"
         }
 
-        ret, msg = self.do_post(url, header, properties)
+        ret, _msg = self.do_post(url, header, properties)
         return ret

@@ -4,7 +4,7 @@ import os
 import json
 
 from . import setting
-from .bklog import logger
+from .bklog import BkLogger
 
 
 class SetOutput():
@@ -12,7 +12,7 @@ class SetOutput():
     @summary: 设置 插件输出
     """
 
-    _log = logger()
+    _log = BkLogger()
 
     def __init__(self):
         self.data_path = os.getenv(setting.BK_DATA_DIR, '.')
@@ -33,18 +33,18 @@ class SetOutput():
             exit(-1)
 
         output_data = output.get("data", {})
-        for k, v in output_data.items():
-            field_type = v.get("type", None)
+        for key, val in output_data.items():
+            field_type = val.get("type", None)
             if field_type == setting.BK_OUTPUT_FIELD_TYPE.get("STRING", ""):
                 pass
             elif field_type == setting.BK_OUTPUT_FIELD_TYPE.get("ARTIFACT", ""):
-                field_value = v.get("value", [])
+                field_value = val.get("value", [])
                 if not isinstance(field_value, list):
-                    self._log.error("[check output error]invalid field[{}], should be list".format(k))
+                    self._log.error("[check output error]invalid field[{}], should be list".format(key))
                     exit(-1)
                 for file_path in field_value:
                     if not os.path.exists(file_path):
-                        self._log.error("[check output error]invalid field[{}], not exists[{}]".format(k, file_path))
+                        self._log.error("[check output error]invalid field[{}], not exists[{}]".format(key, file_path))
                         exit(-1)
             elif field_type == setting.BK_OUTPUT_FIELD_TYPE.get("REPORT", ""):
                 pass
@@ -69,5 +69,5 @@ class SetOutput():
                 self._log.debug("mkdir data_path error")
                 pass
 
-        with open(output_file_path, 'w') as f:
-            json.dump(output, f)
+        with open(output_file_path, 'w') as f_output:
+            json.dump(output, f_output)

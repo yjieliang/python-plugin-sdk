@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from .bklog import logger, getLogger
+from .bklog import BkLogger, get_logger as getLogger
 from .input import ParseParams
 from .output import SetOutput
 from .const import Status, OutputTemplateType, OutputFieldType, OutputReportType
 
-log = logger()
+log = BkLogger()
 parseParamsObj = ParseParams()
 params = parseParamsObj.get_input()
 status = Status()
@@ -86,9 +86,9 @@ def get_test_version_flag():
 
 
 def get_sensitive_conf(key):
-    confJson = params.get("bkSensitiveConfInfo", None)
-    if confJson:
-        return confJson.get(key, None)
+    conf_json = params.get("bkSensitiveConfInfo", None)
+    if conf_json:
+        return conf_json.get(key, None)
     else:
         return None
 
@@ -100,7 +100,7 @@ def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None, buil
         return False, "projectId is null"
     from .openapi import OpenApi
     client = OpenApi()
-    return client.get_artifacts_url(file_src, file_path, projectId=projectId, pipelineId=pipelineId, buildNo=buildNo)
+    return client.get_artifacts_url(file_src, file_path, project_id=projectId, pipeline_id=pipelineId, build_no=buildNo)
 
 
 def get_artifacts_properties(file_src, file_path, projectId=None, pipelineId=None, buildNo=None):
@@ -110,19 +110,19 @@ def get_artifacts_properties(file_src, file_path, projectId=None, pipelineId=Non
         return False, "projectId is null"
     from .openapi import OpenApi
     client = OpenApi()
-    return client.get_artifacts_properties(file_src, file_path, projectId=projectId, pipelineId=pipelineId,
-                                           buildNo=buildNo)
+    return client.get_artifacts_properties(file_src, file_path, project_id=projectId, pipeline_id=pipelineId,
+                                           build_no=buildNo)
 
 
 def set_output(output):
     """
     @summary: 设置输出
     """
-    setOutput = SetOutput()
-    setOutput.set_output(output)
+    set_output = SetOutput()
+    set_output.set_output(output)
 
 
-def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_field="file", timeout=300):
+def upload_file(file_src, file_path, upload_url, params=None, headers=None, file_field="file", timeout=300):
     """
     @summary: 上传构件到第三方平台
     """
@@ -140,6 +140,11 @@ def upload_file(file_src, file_path, upload_url, params={}, headers={}, file_fie
     if len(download_url_list) == 0:
         log.error("can not find file, please check file_src & file_path")
         return False, "can not find file, please check file_src & file_path"
+
+    if not params:
+        params = {}
+    if not headers:
+        headers = {}
 
     return client.upload_file(download_url_list[0], upload_url, params=params, headers=headers, file_field=file_field,
                               timeout=timeout)
@@ -181,14 +186,14 @@ def get_commits():
 
 def docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag,
                 ticketId=None):
-    projectId = get_project_name()
-    buildId = get_pipeline_build_id()
-    pipelineId = get_pipeline_id()
+    project_id = get_project_name()
+    build_id = get_pipeline_build_id()
+    pipeline_id = get_pipeline_id()
 
     from .openapi import OpenApi
     client = OpenApi()
     return client.docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName,
-                              targetImageTag, projectId, buildId, pipelineId, ticketId=ticketId)
+                              targetImageTag, project_id, build_id, pipeline_id, ticket_id=ticketId)
 
 
 def get_docker_push_status(userId, taskId):
@@ -221,9 +226,11 @@ def send_wechat_notify(receivers, body):
     return client.send_wechat_notify(receivers, body)
 
 
-def send_email_notify(receivers, title, body, cc=[], content_format="TEXT"):
+def send_email_notify(receivers, title, body, cc=None, content_format="TEXT"):
     from .openapi import OpenApi
     client = OpenApi()
+    if not cc:
+        cc = []
     return client.send_email_notify(receivers, title, body, cc, content_format)
 
 

@@ -10,11 +10,11 @@ LOG_LEVEL = logging.DEBUG
 BK_CI_PLACEHOLDER = "BK_CI_PLACEHOLDER"
 
 
-def getLogger():
+def get_logger():
     """
     兼容老版本的方法
     """
-    return logger().logger
+    return BkLogger().logger
 
 
 class MyLoggerAdapter(logging.LoggerAdapter):
@@ -37,7 +37,7 @@ class ContextFilter(logging.Filter):
         return True
 
 
-class logger():
+class BkLogger():
 
     def __init__(self):
         init_logger = logging.getLogger(LOG_NAME)
@@ -84,7 +84,7 @@ class logger():
 
 if __name__ == '__main__':
 
-    obj = logger()
+    obj = BkLogger()
     obj.group_start("group1 start")
     obj.info("info is info")
     obj.debug("debug is debug")
@@ -92,4 +92,3 @@ if __name__ == '__main__':
     obj.error("error is error")
     obj.command("this is a command")
     obj.group_end()
-
