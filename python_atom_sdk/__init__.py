@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from .bklog import BkLogger, get_logger as getLogger
+from .bklog import BkLogger as logger, get_logger as getLogger
 from .input import ParseParams
 from .output import SetOutput
 from .const import Status, OutputTemplateType, OutputFieldType, OutputReportType, OutputErrorType
 
-log = BkLogger()
+log = logger()
 parseParamsObj = ParseParams()
 params = parseParamsObj.get_input()
 status = Status()

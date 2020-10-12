@@ -4,6 +4,7 @@ import traceback
 import json
 import requests
 import requests_toolbelt as rt
+from sys import version_info
 
 from . import setting
 from .bklog import BkLogger
@@ -56,12 +57,9 @@ class OpenApi():
                 exit(-1)
 
             return sdk_json
-        except TypeError as _e:
-            self._log.error("[openapi]parse sdk json error: type error, sdk.json is {}" .format(content))
-            exit(-1)
-        else:
-            traceback.print_exc()
-            self._log.error("[openapi]parse sdk json error")
+        except Exception as _e:
+            self._log.error("[openapi]parse sdk json error, sdk.json is {}" .format(content))
+            print(traceback.format_exc())
             exit(-1)
 
     def check_sdk_json(self, src_json):
@@ -83,6 +81,27 @@ class OpenApi():
         else:
             return "http://{}/{}".format(self.gateway, path.lstrip("/"))
 
+    def process_response(self, res):
+        try:
+            if res.status_code == 200:
+                ret = res.json()
+                if ret["status"] != 0:
+                    self._log.error("unexpected status: {}, content is {}".format(ret["status"], ret))
+                    return False, {}
+
+                return True, ret["data"]
+            else:
+                msg = res.json().get("message", "")
+                if version_info.major == 2:
+                    msg = msg.encode("utf-8")
+                self._log.error("unexpected status_code: {}, message is {}".format(res.status_code, msg))
+                return False, {}
+        except Exception as _e:
+            self._log.error(repr(res.text))
+            print(traceback.format_exc())
+            return False, {}
+
+
     def do_get(self, url, params=None, timeout=60):
         # self._log.debug(url)
         if params:
@@ -90,32 +109,7 @@ class OpenApi():
         else:
             res = self.session.get(url, headers=self.header_auth, timeout=timeout)
 
-        try:
-            content = res.text.encode("utf-8")
-        except AttributeError as _e:
-            content = res.text
-        else:
-            content = res.text
-
-        # self._log.debug(r.status_code)
-        # self._log.debug(content)
-        if res.status_code == 200:
-            try:
-                ret = res.json()
-                if ret["status"] != 0:
-                    self._log.error("unexpected status: {}".format(content))
-                    return False, {}
-
-                return True, ret["data"]
-            except TimeoutError as _e:
-                self._log.error("timeout error")
-                return False, {}
-            else:
-                self._log.error("abnormal: {}".format(content))
-                return False, {}
-        else:
-            self._log.error("unexpected status_code: {}".format(content))
-            return False, {}
+        return self.process_response(res)
 
     def do_post(self, url, header=None, message=None, timeout=120):
         for key, val in header.items():
@@ -127,31 +121,7 @@ class OpenApi():
             else:
                 res = session.post(url, headers=self.header_auth, timeout=timeout)
 
-            try:
-                content = res.text.encode("utf-8")
-            except AttributeError as _e:
-                content = res.text
-            else:
-                content = res.text
-
-            if res.status_code == 200:
-                try:
-                    ret = res.json()
-                    if ret["status"] != 0:
-                        self._log.error("unexpected status: {}".format(ret["message"]))
-                        return False, {}
-
-                    return True, ret["data"]
-                except TimeoutError as _e:
-                    self._log.error("timeout error")
-                    return False, {}
-                else:
-                    self._log.error("abnormal: {}".format(content))
-                    return False, {}
-            else:
-                self._log.error(res.status_code)
-                self._log.error("unexpected message: {}".format(res.json()["message"]))
-                return False, {}
+            return self.process_response(res)
 
     def get_artifacts_url(self, file_src, file_path, project_id=None, pipeline_id=None, build_no=None):
         """
@@ -316,30 +286,7 @@ class OpenApi():
 
         res = self.session.post(url, headers=headers, data=json.dumps(params))
 
-        try:
-            content = res.text.encode("utf-8")
-        except AttributeError as _e:
-            content = res.text
-        else:
-            content = res.text
-
-        if res.status_code == 200:
-            try:
-                ret = res.json()
-                if ret["status"] != 0:
-                    self._log.error("unexpected status: {}".format(content))
-                    return False, {}
-
-                return True, ret["data"]
-            except TypeError as _e:
-                self._log.error("abnormal: {}".format(content))
-                return False, {}
-            else:
-                self._log.error("abnormal: {}".format(content))
-                return False, {}
-        else:
-            self._log.error("unexpected status_code: {}".format(content))
-            return False, {}
+        return self.process_response(res)
 
     def get_docker_push_status(self, user_id, task_id):
         """

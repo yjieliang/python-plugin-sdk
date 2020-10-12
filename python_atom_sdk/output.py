@@ -34,6 +34,10 @@ class SetOutput():
 
         output_data = output.get("data", {})
         for key, val in output_data.items():
+            if not isinstance(val, dict):
+                self._log.error("[check output data error]illegal format, must be a dict: {}".format(val))
+                exit(-1)
+
             field_type = val.get("type", None)
             if field_type == setting.BK_OUTPUT_FIELD_TYPE.get("STRING", ""):
                 pass
