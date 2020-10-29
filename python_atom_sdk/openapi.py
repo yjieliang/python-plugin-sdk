@@ -197,7 +197,7 @@ class OpenApi():
             os.makedirs(file_path_dir)
 
         with open(file_path_local, 'wb') as f_file:
-            for chunk in res.iter_content(chunk_size=512):
+            for chunk in res.iter_content(chunk_size=1048576):
                 if chunk:
                     f_file.write(chunk)
 
