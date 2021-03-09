@@ -92,7 +92,7 @@ class OpenApi():
                 return True, ret["data"]
             else:
                 msg = res.json().get("message", "")
-                if version_info.major == 2:
+                if version_info[0] == 2:
                     msg = msg.encode("utf-8")
                 self._log.error("unexpected status_code: {}, message is {}".format(res.status_code, msg))
                 return False, {}
@@ -100,7 +100,6 @@ class OpenApi():
             self._log.error(repr(res.text))
             print(traceback.format_exc())
             return False, {}
-
 
     def do_get(self, url, params=None, timeout=60):
         # self._log.debug(url)

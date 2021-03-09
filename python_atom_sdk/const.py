@@ -39,7 +39,7 @@ class OutputReportType:
 
 class OutputErrorType:
     """
-    @summary:  插件输出字段类型为报告时，报告类型
+    @summary: 插件执行失败时的错误类型
     """
     USER = setting.BK_OUTPUT_ERROR_TYPE.get("USER", None)
     THIRD_PARTY = setting.BK_OUTPUT_ERROR_TYPE.get("THIRD_PARTY", None)
