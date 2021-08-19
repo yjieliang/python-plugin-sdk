@@ -2,9 +2,9 @@
 import os
 import traceback
 import json
+from sys import version_info
 import requests
 import requests_toolbelt as rt
-from sys import version_info
 
 from . import setting
 from .bklog import BkLogger
@@ -37,7 +37,7 @@ class OpenApi():
         """
         @summary：获取sdk配置
         """
-        sdk_path = os.path.join(os.environ.get(setting.BK_DATA_DIR, None), setting.BK_SDK_JSON)
+        sdk_path = os.path.join(os.environ.get(setting.BK_DATA_DIR, ""), setting.BK_SDK_JSON)
         if not os.path.exists(sdk_path):
             self._log.error("[openapi]init error: sdk json do not exist")
             exit(-1)
@@ -57,7 +57,7 @@ class OpenApi():
                 exit(-1)
 
             return sdk_json
-        except Exception as _e:
+        except Exception as _e:  # pylint: disable=broad-except
             self._log.error("[openapi]parse sdk json error, sdk.json is {}" .format(content))
             print(traceback.format_exc())
             exit(-1)
@@ -96,7 +96,7 @@ class OpenApi():
                     msg = msg.encode("utf-8")
                 self._log.error("unexpected status_code: {}, message is {}".format(res.status_code, msg))
                 return False, {}
-        except Exception as _e:
+        except Exception as _e:  # pylint: disable=broad-except
             self._log.error(repr(res.text))
             print(traceback.format_exc())
             return False, {}

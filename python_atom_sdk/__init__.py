@@ -94,7 +94,8 @@ def get_sensitive_conf(key):
         return None
 
 
-def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None, buildNo=None):
+def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None, 
+                      buildNo=None):  # pylint: disable=invalid-name
     if projectId and not pipelineId:
         return False, "pipelineId is null"
     if pipelineId and not projectId:
@@ -104,7 +105,8 @@ def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None, buil
     return client.get_artifacts_url(file_src, file_path, project_id=projectId, pipeline_id=pipelineId, build_no=buildNo)
 
 
-def get_artifacts_properties(file_src, file_path, projectId=None, pipelineId=None, buildNo=None):
+def get_artifacts_properties(file_src, file_path, projectId=None, pipelineId=None, 
+                             buildNo=None):  # pylint: disable=invalid-name
     if projectId and not pipelineId:
         return False, "pipelineId is null"
     if pipelineId and not projectId:
@@ -151,7 +153,8 @@ def upload_file(file_src, file_path, upload_url, params=None, headers=None, file
                               timeout=timeout)
 
 
-def download_file(file_src, file_path, file_name=None, projectId=None, pipelineId=None, buildNo=None):
+def download_file(file_src, file_path, file_name=None, projectId=None, pipelineId=None, 
+                  buildNo=None):  # pylint: disable=invalid-name
     """
     @summary: 从仓库下载构件到本地
     """
@@ -186,7 +189,7 @@ def get_commits():
 
 
 def docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag,
-                ticketId=None):
+                ticketId=None): # pylint: disable=invalid-name
     project_id = get_project_name()
     build_id = get_pipeline_build_id()
     pipeline_id = get_pipeline_id()
@@ -197,7 +200,7 @@ def docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targe
                               targetImageTag, project_id, build_id, pipeline_id, ticket_id=ticketId)
 
 
-def get_docker_push_status(userId, taskId):
+def get_docker_push_status(userId, taskId):  # pylint: disable=invalid-name
     from .openapi import OpenApi
     client = OpenApi()
     return client.get_docker_push_status(userId, taskId)
@@ -206,7 +209,7 @@ def get_docker_push_status(userId, taskId):
 def get_repo_info(identity, identity_type):
     from .openapi import OpenApi
     client = OpenApi()
-    return client.get_repo_info(identity, identity_type)
+    return client.get_repo_info(identity, identity_type)  # pylint: disable=invalid-name
 
 
 def get_git_oauth(userId):
