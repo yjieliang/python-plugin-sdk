@@ -15,6 +15,7 @@ output_report_type = OutputReportType()
 output_error_type = OutputErrorType()
 
 
+# pylint: disable=invalid-name
 def get_input():
     """
     @summary: 获取 插件输入参数
@@ -95,7 +96,7 @@ def get_sensitive_conf(key):
 
 
 def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None, 
-                      buildNo=None):  # pylint: disable=invalid-name
+                      buildNo=None):
     if projectId and not pipelineId:
         return False, "pipelineId is null"
     if pipelineId and not projectId:
@@ -106,7 +107,7 @@ def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None,
 
 
 def get_artifacts_properties(file_src, file_path, projectId=None, pipelineId=None, 
-                             buildNo=None):  # pylint: disable=invalid-name
+                             buildNo=None):
     if projectId and not pipelineId:
         return False, "pipelineId is null"
     if pipelineId and not projectId:
@@ -154,7 +155,7 @@ def upload_file(file_src, file_path, upload_url, params=None, headers=None, file
 
 
 def download_file(file_src, file_path, file_name=None, projectId=None, pipelineId=None, 
-                  buildNo=None):  # pylint: disable=invalid-name
+                  buildNo=None):
     """
     @summary: 从仓库下载构件到本地
     """
@@ -189,7 +190,7 @@ def get_commits():
 
 
 def docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targetImageName, targetImageTag,
-                ticketId=None): # pylint: disable=invalid-name
+                ticketId=None):
     project_id = get_project_name()
     build_id = get_pipeline_build_id()
     pipeline_id = get_pipeline_id()
@@ -200,7 +201,7 @@ def docker_push(userId, srcImageName, srcImageTag, repoAddress, namespace, targe
                               targetImageTag, project_id, build_id, pipeline_id, ticket_id=ticketId)
 
 
-def get_docker_push_status(userId, taskId):  # pylint: disable=invalid-name
+def get_docker_push_status(userId, taskId):
     from .openapi import OpenApi
     client = OpenApi()
     return client.get_docker_push_status(userId, taskId)
@@ -209,7 +210,7 @@ def get_docker_push_status(userId, taskId):  # pylint: disable=invalid-name
 def get_repo_info(identity, identity_type):
     from .openapi import OpenApi
     client = OpenApi()
-    return client.get_repo_info(identity, identity_type)  # pylint: disable=invalid-name
+    return client.get_repo_info(identity, identity_type)
 
 
 def get_git_oauth(userId):
@@ -257,3 +258,5 @@ def set_properties(file_src, file_path, properties):
 
 if __name__ == "__main__":
     pass
+
+# pylint: enable=invalid-name
