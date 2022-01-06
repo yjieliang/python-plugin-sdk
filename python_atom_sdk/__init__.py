@@ -255,6 +255,11 @@ def set_properties(file_src, file_path, properties):
         file_path = "/"+str(file_path).replace("/", "", 1)
     return client.set_properties(file_src, file_path, properties)
 
+def get_context_by_name(context_name):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_context_by_name(context_name)
+
 
 if __name__ == "__main__":
     pass
