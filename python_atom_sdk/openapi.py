@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from logging import log
 import os
 import traceback
 import json
