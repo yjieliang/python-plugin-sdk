@@ -18,6 +18,7 @@ class OpenApi():
         # self._log.info(sdk_json)
 
         self.gateway = sdk_json.get("gateway", None)
+        self.file_gateway = self.get_file_gateway(sdk_json)
         self.header_auth = {
             setting.AUTH_HEADER_DEVOPS_BUILD_TYPE: sdk_json.get("buildType", None),
             setting.AUTH_HEADER_DEVOPS_PROJECT_ID: sdk_json.get("projectId", None),
@@ -146,7 +147,11 @@ class OpenApi():
         url = self.generate_url(path)
         # self._log.debug(url)
         # self._log.debug(params)
-        return self.do_get(url, params=params)
+        result, artifact_url_list = self.do_get(url, params=params)
+        if result and len(self.file_gateway) > 0:
+            for index, artifact_url in enumerate(artifact_url_list):
+                artifact_url_list[index] = "{}/{}".format(self.file_gateway, artifact_url[artifact_url.find("repository"):])
+        return result, artifact_url_list
 
     def get_artifacts_properties(self, file_src, file_path, project_id=None, pipeline_id=None, build_no=None):
         """
@@ -199,7 +204,7 @@ class OpenApi():
             for chunk in res.iter_content(chunk_size=1048576):
                 if chunk:
                     f_file.write(chunk)
-
+                    
         return True, file_path_local
 
     def upload_file(self, download_url, upload_url, params=None, headers=None, file_field="file", timeout=300):
@@ -418,3 +423,14 @@ class OpenApi():
 
         ret, _msg = self.do_post(url, header, properties)
         return ret
+
+    def get_file_gateway(self, sdk_json):
+        file_gateway = sdk_json.get("fileGateway", None)
+        if len(file_gateway.strip()) == 0:
+            return ""
+        
+        if file_gateway.startswith("https://") or file_gateway.startswith("http://"):
+            return file_gateway
+        else:
+            return "http://{}".format(file_gateway)
+
