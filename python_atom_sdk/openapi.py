@@ -406,6 +406,12 @@ class OpenApi():
         url = self.generate_url(path)
         return self.do_get(url)
 
+    def get_context_by_name(self, context_name):
+        path = "/process/api/build/variable/get_build_context?contextName={}&check=true"\
+            .format(context_name)
+        url = self.generate_url(path)
+        return self.do_get(url)
+
     def set_properties(self, file_src, file_path, properties):
         """
         @summary: 设置归档文件元数据
