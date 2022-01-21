@@ -5,5 +5,6 @@
   "secretKey": "2323232",
   "gateway": "apigw.devops.oa.com",
   "buildId": "vvadsaaf",
-  "vmSeqId": "33223"
+  "vmSeqId": "33223",
+  "taskId": "e-123123123123123"
 }
