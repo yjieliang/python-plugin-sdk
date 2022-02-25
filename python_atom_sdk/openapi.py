@@ -186,10 +186,10 @@ class OpenApi():
         @param file_name: 本地储存的文件名，选填
         @ret file_path_local: 下载后存储的本地路径
         """
-        res = self.session.get(file_url, headers=self.header_auth, stream=True)
+        res = self.session.get(file_url, headers=self.header_auth, stream=True, timeout=15)
 
         if res.status_code != 200:
-            self._log.error("download file failed, status_code is {}".format(r.status_code))
+            self._log.error("download file failed, status_code is {}".format(res.status_code))
             return False, res.status_code
 
         if not file_name:
