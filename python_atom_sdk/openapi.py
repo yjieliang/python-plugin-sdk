@@ -60,7 +60,7 @@ class OpenApi():
 
             return sdk_json
         except Exception as _e:  # pylint: disable=broad-except
-            self._log.error("[openapi]parse sdk json error, sdk.json is {}" .format(content))
+            self._log.error("[openapi]parse sdk json error, sdk.json is {}".format(content))
             print(traceback.format_exc())
             exit(-1)
 
@@ -151,8 +151,27 @@ class OpenApi():
         result, artifact_url_list = self.do_get(url, params=params)
         if result and len(self.file_gateway) > 0:
             for index, artifact_url in enumerate(artifact_url_list):
-                artifact_url_list[index] = "{}/{}".format(self.file_gateway, artifact_url[artifact_url.find("repository"):])
+                artifact_url_list[index] = "{}/{}".format(self.file_gateway,
+                                                          artifact_url[artifact_url.find("repository"):])
         return result, artifact_url_list
+
+    def get_sensitive_conf(self, atomCode):
+        """
+        获取插件私有配置
+        :param atomCode: 插件标识
+        :return:
+        """
+        path = "/build/store/sensitiveConf/types/ATOM/codes/{}".format(atomCode)
+        url = self.generate_url(path)
+        res = self.session.get(url, headers=self.header_auth, timeout=15)
+        if res.status_code != 200:
+            self._log.error("获取插件私有配置失败")
+            return False, {}
+        ret = res.json()
+        ret_data = {}
+        for i in ret["data"]:
+            ret_data[i["fieldName"]] = i["fieldValue"]
+        return True, ret_data
 
     def get_artifacts_properties(self, file_src, file_path, project_id=None, pipeline_id=None, build_no=None):
         """
@@ -205,7 +224,7 @@ class OpenApi():
             for chunk in res.iter_content(chunk_size=1048576):
                 if chunk:
                     f_file.write(chunk)
-                    
+
         return True, file_path_local
 
     def upload_file(self, download_url, upload_url, params=None, headers=None, file_field="file", timeout=300):
@@ -251,7 +270,7 @@ class OpenApi():
         url = self.generate_url(path)
         return self.do_get(url)
 
-    def docker_push(self, user_id, src_image_name, src_image_tag, repo_address, namespace, target_image_name, 
+    def docker_push(self, user_id, src_image_name, src_image_tag, repo_address, namespace, target_image_name,
                     target_image_tag, project_id, build_id, pipeline_id, ticket_id=None):
         """
         @summary: 从蓝盾仓库推送镜像到目标仓库
@@ -400,7 +419,7 @@ class OpenApi():
         return ret
 
     def get_commit_build_artifactory_info(self, pipeline_id, user_id, commit_id, file_path):
-        path = "/process/api/build/ipt/repo/pipeline/{}/commit/{}/artifactorytInfo?userId={}"\
+        path = "/process/api/build/ipt/repo/pipeline/{}/commit/{}/artifactorytInfo?userId={}" \
             .format(pipeline_id, commit_id, user_id)
         if file_path:
             path = path + "&filePath=" + file_path
@@ -408,7 +427,7 @@ class OpenApi():
         return self.do_get(url)
 
     def get_context_by_name(self, context_name):
-        path = "/process/api/build/variable/get_build_context?contextName={}&check=true"\
+        path = "/process/api/build/variable/get_build_context?contextName={}&check=true" \
             .format(context_name)
         url = self.generate_url(path)
         return self.do_get(url)
@@ -420,7 +439,7 @@ class OpenApi():
         :param file_path: 构件的相对路径
         :param properties: 新设置的元数据，map类型
         """
-        path = "artifactory/api/build/artifactories/properties?artifactoryType={}&path={}"\
+        path = "artifactory/api/build/artifactories/properties?artifactoryType={}&path={}" \
             .format(file_src, file_path)
         url = self.generate_url(path)
 
@@ -435,9 +454,8 @@ class OpenApi():
         file_gateway = sdk_json.get("fileGateway", None)
         if len(file_gateway.strip()) == 0:
             return ""
-        
+
         if file_gateway.startswith("https://") or file_gateway.startswith("http://"):
             return file_gateway
         else:
             return "http://{}".format(file_gateway)
-

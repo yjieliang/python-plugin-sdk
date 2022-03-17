@@ -87,15 +87,18 @@ def get_test_version_flag():
     return params.get("testVersionFlag", None)
 
 
-def get_sensitive_conf(key):
-    conf_json = params.get("bkSensitiveConfInfo", None)
-    if conf_json:
-        return conf_json.get(key, None)
-    else:
-        return None
+def get_sensitive_conf(atomCode):
+    """
+    summary：获取插件私有配置
+    :param atomCode: 插件标识
+    :return:
+    """
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_sensitive_conf(atomCode)
 
 
-def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None, 
+def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None,
                       buildNo=None):
     if projectId and not pipelineId:
         return False, "pipelineId is null"
@@ -106,7 +109,7 @@ def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None,
     return client.get_artifacts_url(file_src, file_path, project_id=projectId, pipeline_id=pipelineId, build_no=buildNo)
 
 
-def get_artifacts_properties(file_src, file_path, projectId=None, pipelineId=None, 
+def get_artifacts_properties(file_src, file_path, projectId=None, pipelineId=None,
                              buildNo=None):
     if projectId and not pipelineId:
         return False, "pipelineId is null"
@@ -154,7 +157,7 @@ def upload_file(file_src, file_path, upload_url, params=None, headers=None, file
                               timeout=timeout)
 
 
-def download_file(file_src, file_path, file_name=None, projectId=None, pipelineId=None, 
+def download_file(file_src, file_path, file_name=None, projectId=None, pipelineId=None,
                   buildNo=None):
     """
     @summary: 从仓库下载构件到本地
@@ -250,10 +253,11 @@ def set_properties(file_src, file_path, properties):
     from .openapi import OpenApi
     client = OpenApi()
     if str(file_src) == "PIPELINE":
-        file_path = "/"+get_pipeline_id()+"/"+get_pipeline_build_id()+"/"+str(file_path).replace("/", "", 1)
+        file_path = "/" + get_pipeline_id() + "/" + get_pipeline_build_id() + "/" + str(file_path).replace("/", "", 1)
     elif str(file_src) == "CUSTOM_DIR":
-        file_path = "/"+str(file_path).replace("/", "", 1)
+        file_path = "/" + str(file_path).replace("/", "", 1)
     return client.set_properties(file_src, file_path, properties)
+
 
 def get_context_by_name(context_name):
     from .openapi import OpenApi
