@@ -26,7 +26,7 @@ class OpenApi():
             setting.AUTH_HEADER_DEVOPS_AGENT_SECRET_KEY: sdk_json.get("secretKey", None),
             setting.AUTH_HEADER_DEVOPS_BUILD_ID: sdk_json.get("buildId", None),
             setting.AUTH_HEADER_DEVOPS_VM_SEQ_ID: sdk_json.get("vmSeqId", None),
-            setting.AUTH_HEADER_DEVOPS_TASK_ID: sdk_json.get("taskId", None)
+            setting.AUTH_HEADER_DEVOPS_CI_TASK_ID: sdk_json.get("taskId", None)
         }
 
         # 保存session增加3次重试
