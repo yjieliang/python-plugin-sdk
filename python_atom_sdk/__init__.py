@@ -87,15 +87,15 @@ def get_test_version_flag():
     return params.get("testVersionFlag", None)
 
 
-def get_sensitive_conf(atomCode):
+def get_sensitive_conf(key):
     """
     summary：获取插件私有配置
-    :param atomCode: 插件标识
+    :param key: 插件标识
     :return:
     """
     from .openapi import OpenApi
     client = OpenApi()
-    return client.get_sensitive_conf(atomCode)
+    return client.get_sensitive_conf(key)
 
 
 def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None,

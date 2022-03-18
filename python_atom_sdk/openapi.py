@@ -155,23 +155,24 @@ class OpenApi():
                                                           artifact_url[artifact_url.find("repository"):])
         return result, artifact_url_list
 
-    def get_sensitive_conf(self, atomCode):
+    def get_sensitive_conf(self, key):
         """
         获取插件私有配置
-        :param atomCode: 插件标识
+        :param key: 插件标识
         :return:
         """
-        path = "/build/store/sensitiveConf/types/ATOM/codes/{}".format(atomCode)
+        atom_code = self.get_context_by_name("BK_CI_ATOM_CODE")
+        path = "/build/store/sensitiveConf/types/ATOM/codes/{}".format(atom_code)
         url = self.generate_url(path)
         res = self.session.get(url, headers=self.header_auth, timeout=15)
         if res.status_code != 200:
             self._log.error("获取插件私有配置失败")
-            return False, {}
+            return None
         ret = res.json()
-        ret_data = {}
         for i in ret["data"]:
-            ret_data[i["fieldName"]] = i["fieldValue"]
-        return True, ret_data
+            if (i["fieldName"]) == key:
+                return i["fieldValue"]
+        return None
 
     def get_artifacts_properties(self, file_src, file_path, project_id=None, pipeline_id=None, build_no=None):
         """
