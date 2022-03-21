@@ -166,7 +166,7 @@ class OpenApi():
         url = self.generate_url(path)
         res = self.session.get(url, headers=self.header_auth, timeout=15)
         if res.status_code != 200:
-            self._log.error("获取插件私有配置失败")
+            self._log.error("获取插件私有配置失败, content : {}".format(res.json()["message"]))
             return None
         ret = res.json()
         for i in ret["data"]:
