@@ -161,12 +161,13 @@ class OpenApi():
         :param key: 插件标识
         :return:
         """
-        atom_code = self.get_context_by_name("BK_CI_ATOM_CODE")
+        status, atom_code = self.get_context_by_name("BK_CI_ATOM_CODE")
         path = "/build/store/sensitiveConf/types/ATOM/codes/{}".format(atom_code)
         url = self.generate_url(path)
         res = self.session.get(url, headers=self.header_auth, timeout=15)
         if res.status_code != 200:
-            self._log.error("获取插件私有配置失败, content : {}".format(res.json()["message"]))
+            self._log.error("获取插件私有配置失败, status_code: {}, message is : {}".format(res.status_code,
+                                                                                  res.json()["message"]))
             return None
         ret = res.json()
         for i in ret["data"]:
