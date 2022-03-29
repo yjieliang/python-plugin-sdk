@@ -90,8 +90,6 @@ def get_test_version_flag():
 def get_sensitive_conf(key):
     """
     summary：获取插件私有配置
-    :param key: 插件标识
-    :return:
     """
     from .openapi import OpenApi
     client = OpenApi()
