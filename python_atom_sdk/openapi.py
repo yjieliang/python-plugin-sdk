@@ -162,7 +162,7 @@ class OpenApi():
         :return:
         """
         status, atom_code = self.get_context_by_name("BK_CI_ATOM_CODE")
-        path = "/build/store/sensitiveConf/types/ATOM/codes/{}".format(atom_code)
+        path = "/store/api/build/store/sensitiveConf/types/ATOM/codes/{}".format(atom_code)
         url = self.generate_url(path)
         res = self.session.get(url, headers=self.header_auth, timeout=15)
         if res.status_code != 200:
