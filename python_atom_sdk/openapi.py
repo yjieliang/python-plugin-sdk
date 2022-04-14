@@ -158,10 +158,10 @@ class OpenApi():
     def get_sensitive_conf(self, key):
         """
         获取插件私有配置
-        :param key: 插件标识
+        :param key: 私有配置key
         :return:
         """
-        status, atom_code = self.get_context_by_name("BK_CI_ATOM_CODE")
+        _status, atom_code = self.get_context_by_name("BK_CI_ATOM_CODE")
         path = "/store/api/build/store/sensitiveConf/types/ATOM/codes/{}".format(atom_code)
         url = self.generate_url(path)
         res = self.session.get(url, headers=self.header_auth, timeout=15)
