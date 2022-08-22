@@ -25,39 +25,39 @@ def get_input():
 
 
 def get_project_name():
-    return params.get("project.name", None)
+    return params.get("BK_CI_PROJECT_NAME", None)
 
 
 def get_project_name_cn():
-    return params.get("project.name.chinese", None)
+    return params.get("BK_CI_PROJECT_NAME_CN", None)
 
 
 def get_pipeline_id():
-    return params.get("pipeline.id", None)
+    return params.get("BK_CI_PIPELINE_ID", None)
 
 
 def get_pipeline_name():
-    return params.get("pipeline.name", None)
+    return params.get("BK_CI_PIPELINE_NAME", None)
 
 
 def get_pipeline_build_id():
-    return params.get("pipeline.build.id", None)
+    return params.get("BK_CI_BUILD_ID", None)
 
 
 def get_pipeline_build_num():
-    return params.get("pipeline.build.num", None)
+    return params.get("BK_CI_BUILD_NUM", None)
 
 
 def get_pipeline_start_type():
-    return params.get("pipeline.start.type", None)
+    return params.get("BK_CI_START_TYPE", None)
 
 
 def get_pipeline_start_user_id():
-    return params.get("pipeline.start.user.id", None)
+    return params.get("BK_CI_START_USER_ID", None)
 
 
 def get_pipeline_start_user_name():
-    return params.get("pipeline.start.user.name", None)
+    return params.get("BK_CI_START_USER_NAME", None)
 
 
 def get_pipeline_creator():
@@ -69,11 +69,11 @@ def get_pipeline_modifier():
 
 
 def get_pipeline_time_start_mills():
-    return params.get("pipeline.time.start", None)
+    return params.get("BK_CI_BUILD_START_TIME", None)
 
 
 def get_pipeline_version():
-    return params.get("pipeline.version", None)
+    return params.get("BK_CI_PIPELINE_VERSION", None)
 
 
 def get_workspace():
