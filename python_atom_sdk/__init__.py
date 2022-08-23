@@ -91,9 +91,15 @@ def get_sensitive_conf(key):
     """
     summary：获取插件私有配置
     """
-    from .openapi import OpenApi
-    client = OpenApi()
-    return client.get_sensitive_conf(key)
+    # from .openapi import OpenApi
+    # client = OpenApi()
+    # return client.get_sensitive_conf(key)
+
+    conf_json = params.get("bkSensitiveConfInfo", None)
+    if conf_json:
+        return conf_json.get(key, None)
+    else:
+        return None
 
 
 def get_artifact_urls(file_src, file_path, projectId=None, pipelineId=None,
