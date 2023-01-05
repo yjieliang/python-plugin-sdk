@@ -185,8 +185,7 @@ class OpenApi():
         url = self.generate_url(path)
         res = self.session.get(url, headers=self.header_auth, timeout=15)
         if res.status_code != 200:
-            self._log.error("获取buildId失败, status_code: {}, message is : {}".format(res.status_code,
-                                                                                  res.json()["message"]))
+            self._log.error("获取buildId失败, status_code: {},message is : buildNum not exist".format(res.status_code))
             return None
         ret = res.json()
         return ret["data"]["id"]
