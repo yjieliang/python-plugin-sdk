@@ -175,6 +175,21 @@ class OpenApi():
                 return i["fieldValue"]
         return None
 
+    def get_buildId_by_buildNum(self, build_num):
+        """
+        获取buildId
+        """
+        _status, project_id = self.get_context_by_name("BK_CI_PROJECT_NAME")
+        _status, pipeline_id = self.get_context_by_name("BK_CI_PIPELINE_ID")
+        path = "/process/api/build/builds/{}/{}/{}/history".format(project_id, pipeline_id, build_num)
+        url = self.generate_url(path)
+        res = self.session.get(url, headers=self.header_auth, timeout=15)
+        if res.status_code != 200:
+            self._log.error("获取buildId失败, status_code: {},message is : buildNum not exist".format(res.status_code))
+            return None
+        ret = res.json()
+        return ret["data"]["id"]
+
     def get_artifacts_properties(self, file_src, file_path, project_id=None, pipeline_id=None, build_no=None):
         """
         @summary: 获取已归档构件的元数据

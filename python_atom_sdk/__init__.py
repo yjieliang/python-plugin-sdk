@@ -43,6 +43,10 @@ def get_pipeline_name():
 def get_pipeline_build_id():
     return params.get("BK_CI_BUILD_ID", None)
 
+def get_buildId_by_buildNum(build_num):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_buildId_by_buildNum(build_num)
 
 def get_pipeline_build_num():
     return params.get("BK_CI_BUILD_NUM", None)
