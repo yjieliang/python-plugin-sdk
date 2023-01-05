@@ -175,11 +175,12 @@ class OpenApi():
                 return i["fieldValue"]
         return None
 
-    def get_buildId_by_buildNum(self, project_id, pipeline_id, build_num):
+    def get_buildId_by_buildNum(self, build_num):
         """
         获取buildId
         """
-
+        _status, project_id = self.get_context_by_name("BK_CI_PROJECT_NAME")
+        _status, pipeline_id = self.get_context_by_name("BK_CI_PIPELINE_ID")
         path = "/process/api/build/builds/{}/{}/{}/history".format(project_id, pipeline_id, build_num)
         url = self.generate_url(path)
         res = self.session.get(url, headers=self.header_auth, timeout=15)
