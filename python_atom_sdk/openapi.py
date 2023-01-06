@@ -188,7 +188,10 @@ class OpenApi():
             self._log.error("获取buildId失败, status_code: {},message is : buildNum not exist".format(res.status_code))
             return None
         ret = res.json()
-        return ret["data"]["id"]
+        try:
+            return ret["data"]["id"]
+        except KeyError:
+            return None
 
     def get_artifacts_properties(self, file_src, file_path, project_id=None, pipeline_id=None, build_no=None):
         """
