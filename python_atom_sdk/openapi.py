@@ -447,7 +447,7 @@ class OpenApi():
         return self.do_get(url)
 
     def get_context_by_name(self, context_name):
-        path = "/process/api/build/variable/get_build_context?contextName={}&check=true" \
+        path = "/process/api/build/variable/get_build_context?contextName={}&check=false" \
             .format(context_name)
         url = self.generate_url(path)
         return self.do_get(url)
