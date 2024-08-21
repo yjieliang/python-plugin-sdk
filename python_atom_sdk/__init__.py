@@ -90,15 +90,21 @@ def get_test_version_flag():
     """
     return params.get("testVersionFlag", None)
 
-
 def get_sensitive_conf(key):
     """
     summary：获取插件私有配置
+    参数：
+    - key (str): 要获取的配置项的键。
     """
-    # from .openapi import OpenApi
-    # client = OpenApi()
-    # return client.get_sensitive_conf(key)
+    from .openapi import OpenApi
+    client = OpenApi()
+    config_from_openapi = client.get_sensitive_conf(key)
 
+    # 如果OpenApi获取到的配置不为空，则直接返回
+    if config_from_openapi is not None:
+        return config_from_openapi
+
+    # 如果OpenApi获取到的配置为空，则尝试从params字典中获取
     conf_json = params.get("bkSensitiveConfInfo", None)
     if conf_json:
         return conf_json.get(key, None)
