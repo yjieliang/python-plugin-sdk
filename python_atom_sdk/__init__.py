@@ -97,26 +97,11 @@ def get_test_version_flag():
 def get_sensitive_conf(key):
     """
     summary：获取插件私有配置
-    参数：
-    - key (str): 要获取的配置项的键。
     """
-    from .openapi import OpenApi
-    client = OpenApi()
-    try:
-        # 尝试使用OpenApi方式获取配置
-        config_from_openapi = client.get_sensitive_conf(key)
+    # from .openapi import OpenApi
+    # client = OpenApi()
+    # return client.get_sensitive_conf(key)
 
-        # 如果OpenApi获取到的配置不为空，则直接返回
-        if config_from_openapi is not None:
-            return config_from_openapi
-    except ImportError as e:
-        # 如果OpenApi类无法导入，跳过OpenApi获取步骤
-        print(f"OpenApi类无法导入，请检查模块依赖: {e}")
-    except Exception as e:
-        # 捕获所有其他异常
-        print(f"An error occurred while trying to use OpenApi: {e}")
-
-    # 无论是否成功获取到配置，都尝试从bkSensitiveConfInfo获取
     conf_json = params.get("bkSensitiveConfInfo", None)
     if conf_json:
         return conf_json.get(key, None)
