@@ -83,6 +83,9 @@ def get_pipeline_version():
 def get_workspace():
     return params.get("bkWorkspace", None)
 
+def get_post_action_parent_task_id():
+    return params.get("parentTaskId", None)
+
 
 def get_test_version_flag():
     """
@@ -97,10 +100,10 @@ def get_sensitive_conf(key):
     参数：
     - key (str): 要获取的配置项的键。
     """
+    from .openapi import OpenApi
+    client = OpenApi()
     try:
         # 尝试使用OpenApi方式获取配置
-        from .openapi import OpenApi
-        client = OpenApi()
         config_from_openapi = client.get_sensitive_conf(key)
 
         # 如果OpenApi获取到的配置不为空，则直接返回

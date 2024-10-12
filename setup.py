@@ -23,7 +23,7 @@ def parse_requirements():
 
 if __name__ == "__main__":
     setup(
-        version="1.2.18",
+        version="1.2.19",
         name="python_atom_sdk",
         description="",
 
