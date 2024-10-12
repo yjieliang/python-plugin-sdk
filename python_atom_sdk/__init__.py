@@ -83,16 +83,14 @@ def get_pipeline_version():
 def get_workspace():
     return params.get("bkWorkspace", None)
 
-def get_post_action_parent_task_id():
-    return params.get("parentTaskId", None)
-
-
 def get_test_version_flag():
     """
     @summary: 当前插件是否是测试版本标识
     """
     return params.get("testVersionFlag", None)
 
+def get_post_action_parent_task_id():
+    return params.get("parentTaskId", None)
 
 def get_sensitive_conf(key):
     """
