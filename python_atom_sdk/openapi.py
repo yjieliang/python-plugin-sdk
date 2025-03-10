@@ -15,7 +15,7 @@ class OpenApi():
     _log = BkLogger()
 
     def __init__(self):
-        self._check_dependencies()  # 前置依赖检查
+        self.check_dependencies()  # 前置依赖检查
         self._dynamic_import()
         sdk_json = self.get_sdk_json()
         # self._log.info(sdk_json)
@@ -38,14 +38,13 @@ class OpenApi():
         adapter = requests.adapters.HTTPAdapter(max_retries=3)
         self.session.mount('http://', adapter)
 
-    def _check_dependencies(self):
-        """安全依赖检查与安装"""
+    def check_dependencies(self):
         required = {
             "requests": "2.20.1",
             "requests-toolbelt": "0.9.1"
         }
 
-        # 版本检查逻辑
+        # 检查遗漏是否满足
         missing = []
         outdated = []
         for pkg, ver in required.items():
@@ -58,10 +57,9 @@ class OpenApi():
 
         # 安装处理
         if missing or outdated:
-            self._install_packages(missing + outdated)
+            self.install_packages(missing + outdated)
 
-    def _install_packages(self, packages):
-        """安全安装依赖项"""
+    def install_packages(self, packages):
         cmd = [
                   sys.executable,
                   "-m",
@@ -76,13 +74,11 @@ class OpenApi():
             self._log.info("Successfully installed: {}".format(", ".join(packages)))
         except subprocess.CalledProcessError as e:
             self._log.error("Install failed with code {}".format(e.returncode))
-            sys.exit(-1)
         except Exception as e:
             self._log.error("Install error: {}".format(str(e)))
-            sys.exit(-1)
 
     def _dynamic_import(self):
-        """动态导入依赖模块"""
+        # 延迟导入
         global requests, rt
         try:
             import requests
@@ -91,7 +87,6 @@ class OpenApi():
             rt.MultipartEncoder = MultipartEncoder
         except ImportError as e:
             self._log.error("Critical import failed: {}".format(str(e)))
-            sys.exit(-1)
 
     def get_sdk_json(self):
         """
