@@ -44,7 +44,7 @@ class OpenApi():
             "requests-toolbelt": "0.9.1"
         }
 
-        # 检查遗漏是否满足
+        # 检查依赖是否满足
         missing = []
         outdated = []
         for pkg, ver in required.items():
@@ -55,7 +55,7 @@ class OpenApi():
             except pkg_resources.DistributionNotFound:
                 missing.append("{}=={}".format(pkg, ver))
 
-        # 安装处理
+        # 安装依赖
         if missing or outdated:
             self.install_packages(missing + outdated)
 
