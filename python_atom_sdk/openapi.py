@@ -55,7 +55,7 @@ class OpenApi():
             except pkg_resources.DistributionNotFound:
                 missing.append("{}=={}".format(pkg, ver))
 
-        # 安装依赖
+        # 安装处理
         if missing or outdated:
             self.install_packages(missing + outdated)
 
@@ -74,8 +74,10 @@ class OpenApi():
             self._log.info("Successfully installed: {}".format(", ".join(packages)))
         except subprocess.CalledProcessError as e:
             self._log.error("Install failed with code {}".format(e.returncode))
+            sys.exit(-1)
         except Exception as e:
             self._log.error("Install error: {}".format(str(e)))
+            sys.exit(-1)
 
     def _dynamic_import(self):
         # 延迟导入
@@ -87,6 +89,7 @@ class OpenApi():
             rt.MultipartEncoder = MultipartEncoder
         except ImportError as e:
             self._log.error("Critical import failed: {}".format(str(e)))
+            sys.exit(-1)
 
     def get_sdk_json(self):
         """
