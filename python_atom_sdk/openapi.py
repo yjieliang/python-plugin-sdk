@@ -536,20 +536,19 @@ class OpenApi():
         else:
             return "http://{}".format(file_gateway)
 
-
     def get_project_bg(self, project_code=None):
         """
         获取当前构建流水线项目所属BG
         """
         if project_code is None:
             # 默认获取当前构建项目代码
-            project_code = self.get_context_by_name("BK_CI_PROJECT_NAME")
+            status, project_code = self.get_context_by_name("BK_CI_PROJECT_NAME")
         path = "/project/api/build/projects/{}".format(project_code)
         url = self.generate_url(path)
         res = self.session.get(url, headers=self.header_auth, timeout=15)
         if res.status_code != 200:
             self._log.error("获取构建项目信息失败, status_code: {}, message is : {}".format(res.status_code,
-                                                                                  res.json()["message"]))
+                                                                                            res.json()["message"]))
             return None
         try:
             project_data = res.json()["data"][0]
