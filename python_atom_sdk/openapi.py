@@ -51,9 +51,9 @@ class OpenApi():
             try:
                 dist = pkg_resources.get_distribution(pkg)
                 if pkg_resources.parse_version(dist.version) < pkg_resources.parse_version(ver):
-                    outdated.append("{}=={}".format(pkg, ver))
+                    outdated.append("{}>={}".format(pkg, ver))
             except pkg_resources.DistributionNotFound:
-                missing.append("{}=={}".format(pkg, ver))
+                missing.append("{}>={}".format(pkg, ver))
 
         # 安装处理
         if missing or outdated:
