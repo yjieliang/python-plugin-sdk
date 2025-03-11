@@ -23,8 +23,8 @@ def parse_requirements():
 
 if __name__ == "__main__":
     setup(
-        version="0.0.1",
-        name="yjietest",
+        version="1.2.19",
+        name="python_atom_sdk",
         description="",
 
         cmdclass={},
