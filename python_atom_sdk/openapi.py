@@ -2,9 +2,10 @@
 import os
 import traceback
 import json
+import subprocess
+import sys
 from sys import version_info
-import requests
-import requests_toolbelt as rt
+import pkg_resources
 
 from . import setting
 from .bklog import BkLogger
@@ -14,6 +15,8 @@ class OpenApi():
     _log = BkLogger()
 
     def __init__(self):
+        self.check_dependencies()  # 前置依赖检查
+        self._dynamic_import()
         sdk_json = self.get_sdk_json()
         # self._log.info(sdk_json)
 
@@ -34,6 +37,59 @@ class OpenApi():
         self.session.trust_env = False
         adapter = requests.adapters.HTTPAdapter(max_retries=3)
         self.session.mount('http://', adapter)
+
+    def check_dependencies(self):
+        required = {
+            "requests": "2.20.1",
+            "requests-toolbelt": "0.9.1"
+        }
+
+        # 检查依赖是否满足
+        missing = []
+        outdated = []
+        for pkg, ver in required.items():
+            try:
+                dist = pkg_resources.get_distribution(pkg)
+                if pkg_resources.parse_version(dist.version) < pkg_resources.parse_version(ver):
+                    outdated.append("{}>={}".format(pkg, ver))
+            except pkg_resources.DistributionNotFound:
+                missing.append("{}>={}".format(pkg, ver))
+
+        # 安装处理
+        if missing or outdated:
+            self.install_packages(missing + outdated)
+
+    def install_packages(self, packages):
+        cmd = [
+                  sys.executable,
+                  "-m",
+                  "pip",
+                  "install",
+                  "--disable-pip-version-check",
+                  "--quiet"
+              ] + packages
+
+        try:
+            subprocess.check_call(cmd)
+            self._log.info("Successfully installed: {}".format(", ".join(packages)))
+        except subprocess.CalledProcessError as e:
+            self._log.error("Install failed with code {}".format(e.returncode))
+            sys.exit(-1)
+        except Exception as e:
+            self._log.error("Install error: {}".format(str(e)))
+            sys.exit(-1)
+
+    def _dynamic_import(self):
+        # 延迟导入
+        global requests, rt
+        try:
+            import requests
+            from requests_toolbelt import MultipartEncoder
+            rt = sys.modules[__package__ + '.rt'] = type(sys)('requests_toolbelt')
+            rt.MultipartEncoder = MultipartEncoder
+        except ImportError as e:
+            self._log.error("Critical import failed: {}".format(str(e)))
+            sys.exit(-1)
 
     def get_sdk_json(self):
         """
