@@ -273,6 +273,11 @@ def get_context_by_name(context_name):
     client = OpenApi()
     return client.get_context_by_name(context_name)
 
+def get_project_bg(project_code):
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.get_project_bg(project_code)
+
 
 if __name__ == "__main__":
     pass
