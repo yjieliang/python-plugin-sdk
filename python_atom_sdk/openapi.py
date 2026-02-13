@@ -494,6 +494,39 @@ class OpenApi():
 
         return ret
 
+    def send_wework_media_notify(self, receivers, receiver_type, media_type, media_name, file_path):
+        """
+        @summary：发送企业微信多媒体信息
+        :param receivers: 企业微信群Id，多个用逗号分隔
+        :param receiver_type: 接受人类型，如 group
+        :param media_type: 文件类型，如 file、voice、video
+        :param media_name: 文件名称
+        :param file_path: 本地文件路径
+        :return:
+        """
+        path = "/notify/api/build/notifies/wework/media"
+        url = self.generate_url(path)
+
+        params = {
+            "receivers": receivers,
+            "receiverType": receiver_type,
+            "mediaType": media_type,
+            "mediaName": media_name
+        }
+
+        multipart_encoder = rt.MultipartEncoder(
+            fields={
+                "file": (media_name, open(file_path, "rb"), "application/octet-stream")
+            }
+        )
+
+        headers = dict(self.header_auth)
+        headers["Content-Type"] = multipart_encoder.content_type
+
+        res = self.session.post(url, headers=headers, data=multipart_encoder, params=params, timeout=300)
+
+        return self.process_response(res)
+
     def get_commit_build_artifactory_info(self, pipeline_id, user_id, commit_id, file_path):
         path = "/process/api/build/ipt/repo/pipeline/{}/commit/{}/artifactorytInfo?userId={}" \
             .format(pipeline_id, commit_id, user_id)

@@ -251,6 +251,21 @@ def send_email_notify(receivers, title, body, cc=None, content_format="TEXT"):
     return client.send_email_notify(receivers, title, body, cc, content_format)
 
 
+def send_wework_media_notify(receivers, receiver_type, media_type, media_name, file_path):
+    """
+    @summary: 发送企业微信多媒体信息
+    :param receivers: 企业微信群Id，多个用逗号分隔
+    :param receiver_type: 接受人类型，如 group
+    :param media_type: 文件类型，如 file、voice、video
+    :param media_name: 文件名称
+    :param file_path: 本地文件路径
+    :return:
+    """
+    from .openapi import OpenApi
+    client = OpenApi()
+    return client.send_wework_media_notify(receivers, receiver_type, media_type, media_name, file_path)
+
+
 # ipt专用
 def get_commit_build_artifactory_info(pipeline_id, user_id, commit_id, file_path):
     from .openapi import OpenApi
